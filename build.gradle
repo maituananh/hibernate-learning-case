@@ -1,0 +1,57 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.2.0'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'org.postgresql:postgresql'
+
+	// spring-boot-starter-data-jpa-test đã kèm JUnit 5 + AssertJ, không thêm thư viện test nào khác.
+	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+	testImplementation 'org.testcontainers:testcontainers-postgresql'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Cấu hình task `test`. Có 3 cái bẫy của Gradle, mỗi cái xử lý ngay bên dưới.
+// ─────────────────────────────────────────────────────────────────────────
+tasks.named('test') {
+	useJUnitPlatform()
+
+	// BẪY 1 (D15): mặc định Gradle GIẤU stdout/log của test. Nếu không bật dòng này
+	// thì sẽ không thấy câu SQL Hibernate in ra và các dòng [LIFECYCLE], mất nửa giá trị học tập.
+	testLogging {
+		showStandardStreams = true
+		events 'passed', 'failed', 'skipped'
+		exceptionFormat = 'full'
+	}
+
+	// BẪY 2 (D16): test chạy trong một JVM riêng do Gradle fork ra, nên cờ
+	// `-Dspring.profiles.active=inspect` gõ ở dòng lệnh KHÔNG truyền sang JVM đó.
+	// Vì vậy dùng cờ của Gradle: `./gradlew test -Pinspect`, rồi gán systemProperty tại đây.
+	// Profile `inspect` chạy test vào Postgres của docker compose (giữ lại dữ liệu để xem).
+	if (project.hasProperty('inspect')) {
+		systemProperty 'spring.profiles.active', 'inspect'
+	}
+
+	// BẪY 3 (D17): code không đổi thì Gradle coi task `test` là UP-TO-DATE và bỏ qua.
+	// Muốn chạy lại không đổi code:   ./gradlew test --rerun
+	// Đổi giữa `-Pinspect` và không có `-Pinspect` thì Gradle tự chạy lại (vì input thay đổi).
+}

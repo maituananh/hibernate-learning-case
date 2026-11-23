@@ -1,0 +1,13 @@
+# Cấu hình khi chạy app THỦ CÔNG (khám phá). Test dùng src/test/resources/application.yml.
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hibernate_lab
+    username: hibernate_lab
+    password: hibernate_lab
+  jpa:
+    # Tắt Open Session In View: không để session mở rộng ra ngoài transaction,
+    # nếu không LazyInitializationException sẽ bị che mất.
+    open-in-view: false
+    hibernate:
+      # `create` = xoá và tạo lại schema mỗi lần khởi động. Chỉ dùng để khám phá bằng tay.
+      ddl-auto: create

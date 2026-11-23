@@ -1,0 +1,28 @@
+# Postgres dùng cho profile `inspect` (xem dữ liệu sau test) và khi chạy app thủ công.
+# Test bình thường KHÔNG cần file này: Testcontainers tự dựng Postgres riêng.
+#   docker compose up -d
+#   ./gradlew test -Pinspect --rerun
+services:
+  postgres:
+    # Ghim major version để tránh bất ngờ khi `latest` đổi (từ 18 trở đi đổi cả đường dẫn data).
+    image: postgres:17
+    environment:
+      POSTGRES_USER: hibernate_lab
+      POSTGRES_PASSWORD: hibernate_lab
+      POSTGRES_DB: hibernate_lab
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # Giao diện web xem DB (máy không có psql): http://localhost:8081
+  # Đăng nhập: System=PostgreSQL, Server=postgres, user/password/db = hibernate_lab
+  adminer:
+    image: adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
