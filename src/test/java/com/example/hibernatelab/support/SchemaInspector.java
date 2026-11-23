@@ -35,6 +35,12 @@ public class SchemaInspector {
 			String.class, schema);
 	}
 
+	/** Tên các sequence trong schema, theo thứ tự abc (để chứng minh "bảng này KHÔNG có sequence riêng"). */
+	public List<String> sequencesOf(String schema) {
+		return jdbc.queryForList("select sequencename from pg_sequences where schemaname = ? order by sequencename",
+			String.class, schema);
+	}
+
 	/** Các cột của bảng theo thứ tự khai báo. */
 	public List<Column> columnsOf(String schema, String table) {
 		return jdbc.query("""
