@@ -1,4 +1,4 @@
-package com.example.hibernatelab;
+package com.example.hibernatelab.support;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -10,8 +10,10 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * Dựng một container PostgreSQL thật cho test.
  *
- * <p>Mọi test class dùng chung cấu hình này nên Spring chỉ tạo một context (và một container)
- * cho cả suite, tránh khởi động Postgres lặp lại.
+ * <p>"Singleton": mọi test class đều extend {@link AbstractScenarioTest} nên dùng chung một cấu hình,
+ * Spring chỉ tạo MỘT application context (cache lại) và do đó chỉ MỘT container cho cả suite.
+ * Nếu có test class nào khai báo cấu hình khác thì Spring sẽ dựng context thứ hai kèm container thứ hai
+ * (chậm hơn nhiều), vì vậy đừng thêm {@code @Import}/{@code @MockBean}/{@code @ActiveProfiles} riêng cho từng class.
  *
  * <p>{@code @ServiceConnection} tự gán url/username/password của container vào datasource,
  * không cần khai báo trong yml.
@@ -21,12 +23,12 @@ import org.testcontainers.utility.DockerImageName;
  */
 @TestConfiguration(proxyBeanMethods = false)
 @Profile("!inspect")
-public class TestcontainersConfiguration {
+public class PostgresTestcontainer {
 
 	@Bean
 	@ServiceConnection
 	PostgreSQLContainer postgresContainer() {
-		// Cùng major version với docker-compose.yml để hai chế độ chạy cho kết quả giống nhau.
+		// Ghim image (cùng major version với docker-compose.yml) để hai chế độ chạy cho kết quả giống nhau.
 		return new PostgreSQLContainer(DockerImageName.parse("postgres:17"));
 	}
 }

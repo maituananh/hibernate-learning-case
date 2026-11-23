@@ -1,7 +1,9 @@
 # Profile `inspect`: chạy test vào Postgres của docker compose để GIỮ LẠI dữ liệu sau test.
 # Bật bằng:  docker compose up -d && ./gradlew test -Pinspect --rerun
 # (không dùng -Dspring.profiles.active vì Gradle fork JVM riêng, cờ đó không truyền sang)
-# Khi profile này bật, Testcontainers không chạy (xem TestcontainersConfiguration).
+# Khi profile này bật, Testcontainers không chạy (xem PostgresTestcontainer).
+# Lần chạy đầu trên DB trống sẽ có vài WARN "drop schema … does not exist": vô hại,
+# Hibernate drop trước rồi mới create.
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/hibernate_lab
@@ -11,3 +13,10 @@ spring:
     hibernate:
       # `create` (không phải create-drop) để schema và dữ liệu còn nguyên sau khi test kết thúc.
       ddl-auto: create
+    properties:
+      jakarta:
+        persistence:
+          schema-generation:
+            database:
+              # Ghi đè `create-drop` ở application.yml (xem BẪY ở đó). `create` = không xoá schema khi kết thúc.
+              action: create

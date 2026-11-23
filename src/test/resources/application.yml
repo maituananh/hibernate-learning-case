@@ -20,6 +20,11 @@ spring:
       jakarta:
         persistence:
           schema-generation:
+            # BẪY: hễ khai báo `scripts.action` (bên dưới) thì Hibernate chỉ XUẤT FILE mà KHÔNG còn tạo bảng
+            # trong DB (bỏ qua spring.jpa.hibernate.ddl-auto). Nên phải nói tường minh `database.action`.
+            # Profile `inspect` ghi đè thành `create` (xem application-inspect.yml).
+            database:
+              action: create-drop
             scripts:
               action: create
               create-target: build/ddl/create.sql

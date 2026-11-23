@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import com.example.hibernatelab.support.AbstractScenarioTest;
 
 /**
  * G0-SMOKE: kiểm tra hạ tầng, chưa liên quan tới mapping.
@@ -16,9 +16,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * <p>Kết luận: nếu test này xanh thì Testcontainers (hoặc compose khi {@code -Pinspect}) hoạt động,
  * và câu SQL phải hiện ra trên terminal (chứng minh {@code showStandardStreams} trong build.gradle có tác dụng).
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@Import(TestcontainersConfiguration.class)
-class SmokeTest {
+class SmokeTest extends AbstractScenarioTest {
+
+	// Smoke test không dùng bảng nào nên không có schema cần dọn.
+	@Override
+	protected String[] schemasUnderTest() {
+		return new String[] {};
+	}
 
 	@Autowired
 	JdbcTemplate jdbc;
