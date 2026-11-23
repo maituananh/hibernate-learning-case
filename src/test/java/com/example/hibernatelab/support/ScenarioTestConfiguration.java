@@ -17,7 +17,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @TestConfiguration(proxyBeanMethods = false)
 @EntityScan(basePackages = {
 	"com.example.hibernatelab.support.selftest", // entity tự kiểm thử hạ tầng (schema support_selftest)
-	"com.example.hibernatelab.g0_lifecycle" // Phase 1+: G0
+	"com.example.hibernatelab.g0_lifecycle", // Phase 2: G0
+	"com.example.hibernatelab.g1_owning_side" // Phase 3: G1 (9 biến thể, mỗi biến thể một sub-package và một schema)
 })
 public class ScenarioTestConfiguration {
 

@@ -30,9 +30,21 @@ public class DbReader {
 		this.jdbc = jdbc;
 	}
 
-	/** Tất cả các dòng của bảng, sắp theo id (mỗi dòng là Map tên cột → giá trị). */
+	/**
+	 * Tất cả các dòng của bảng, sắp theo id (mỗi dòng là Map tên cột → giá trị).
+	 * Bảng nối (join table) không có cột {@code id} nên được sắp theo hai cột đầu tiên.
+	 */
 	public List<Map<String, Object>> rowsOf(String table) {
-		return jdbc.queryForList("select * from " + checked(table) + " order by id");
+		String orderBy = hasIdColumn(table) ? "id" : "1, 2";
+		return jdbc.queryForList("select * from " + checked(table) + " order by " + orderBy);
+	}
+
+	private boolean hasIdColumn(String table) {
+		String[] schemaAndTable = checked(table).split("\\.");
+		Integer count = jdbc.queryForObject(
+			"select count(*) from information_schema.columns where table_schema = ? and table_name = ? and column_name = 'id'",
+			Integer.class, schemaAndTable[0], schemaAndTable[1]);
+		return count != null && count > 0;
 	}
 
 	/** Một dòng theo id. Báo lỗi rõ ràng nếu không có dòng nào, để test đỏ với thông báo dễ hiểu. */

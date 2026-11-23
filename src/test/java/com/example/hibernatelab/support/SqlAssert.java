@@ -117,6 +117,28 @@ public class SqlAssert {
 		}
 	}
 
+	/** Có ít nhất một câu SQL chứa đoạn văn bản này (không phân biệt hoa thường). Ví dụ {@code "left join"}. */
+	public void assertSomeStatementContains(String fragment) {
+		boolean found = false;
+		for (String statement : captor.statements()) {
+			if (statement.toLowerCase(Locale.ROOT).contains(fragment.toLowerCase(Locale.ROOT))) {
+				found = true;
+			}
+		}
+		assertThat(found).as("Phải có câu SQL chứa \"" + fragment + "\". " + listing()).isTrue();
+	}
+
+	/** KHÔNG câu SQL nào chứa đoạn văn bản này (không phân biệt hoa thường). */
+	public void assertNoStatementContains(String fragment) {
+		boolean found = false;
+		for (String statement : captor.statements()) {
+			if (statement.toLowerCase(Locale.ROOT).contains(fragment.toLowerCase(Locale.ROOT))) {
+				found = true;
+			}
+		}
+		assertThat(found).as("KHÔNG được có câu SQL chứa \"" + fragment + "\". " + listing()).isFalse();
+	}
+
 	// ── nội bộ ──
 
 	private void assertCount(String kind, Pattern pattern, String table, int expected) {
