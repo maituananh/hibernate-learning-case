@@ -57,6 +57,38 @@ public class SchemaInspector {
 			schema, table);
 	}
 
+	/** Bảng có cột này không? (dùng để chứng minh "cột customer_id KHÔNG tồn tại" hoặc "có tồn tại"). */
+	public boolean hasColumn(String schema, String table, String columnName) {
+		for (Column column : columnsOf(schema, table)) {
+			if (column.name().equals(columnName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Lấy đúng một cột theo tên; báo lỗi rõ ràng (liệt kê các cột hiện có) nếu bảng không có cột đó. */
+	public Column columnNamed(String schema, String table, String columnName) {
+		List<Column> columns = columnsOf(schema, table);
+		for (Column column : columns) {
+			if (column.name().equals(columnName)) {
+				return column;
+			}
+		}
+		throw new AssertionError("Bảng " + schema + "." + table + " không có cột \"" + columnName + "\". Các cột hiện có: " + columns);
+	}
+
+	/** Lấy khoá ngoại nằm trên cột này; báo lỗi rõ ràng nếu cột không phải là FK. */
+	public ForeignKey foreignKeyOnColumn(String schema, String table, String columnName) {
+		List<ForeignKey> foreignKeys = foreignKeysOf(schema, table);
+		for (ForeignKey foreignKey : foreignKeys) {
+			if (foreignKey.column().equals(columnName)) {
+				return foreignKey;
+			}
+		}
+		throw new AssertionError("Bảng " + schema + "." + table + " không có FK nào trên cột \"" + columnName + "\". Các FK hiện có: " + foreignKeys);
+	}
+
 	/** Tên các cột tạo nên primary key (rỗng nếu bảng không có PK). */
 	public List<String> primaryKeyOf(String schema, String table) {
 		return jdbc.queryForList("""
