@@ -71,6 +71,10 @@ Không viết assert theo trí nhớ. Chạy ở chế độ quan sát (in SQL +
 - Làm từng phase theo 03-PHASES. **Dừng chờ người học duyệt** ở 2 checkpoint: (1) sau golden test G0-S01 (Phase 1), (2) sau khi xong G1 (Phase 3).
 - Cuối mỗi phase: chạy toàn bộ suite, báo số test xanh/đỏ, liệt kê 🔬 khác giả thuyết, cập nhật README của nhóm.
 - Bắt đầu triển khai từng phase của dự án theo thứ tự 03-PHASES. **Mỗi phase commit đúng 1 lần**, sau khi suite xanh và README nhóm đã cập nhật. Không gộp nhiều phase vào một commit, không commit giữa chừng khi phase chưa xong. Message theo dạng `feat(phase-N): <tên phase>` (hoặc `chore`/`docs` nếu phù hợp).
+- **Sau khi commit xong thì push và tạo Pull Request** (`git push -u origin <nhánh>` rồi `gh pr create`). Description của PR viết tiếng Việt có dấu, mô tả **rõ ràng cho từng case (từng tình huống G<N>-S<NN> hoặc từng biến thể) trong phase**, mỗi case gồm:
+  - **Mục đích:** tình huống này muốn chứng minh/trả lời câu hỏi gì.
+  - **Cách giải quyết:** mapping/cấu hình nào được dùng và test kiểm chứng ra sao (SQL, dữ liệu thật, lifecycle).
+  - Ngoài ra ghi kết quả suite (số test xanh/đỏ) và các tình huống 🔬 khác giả thuyết (nếu có). Kết thúc bằng dòng attribution theo system-reminder.
 
 ## Chú thích cho người mới
 
