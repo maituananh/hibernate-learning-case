@@ -1,0 +1,12 @@
+package com.example.hibernatelab.g1_owning_side.v3nn_o2m_uni_joincolumn_nn;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * Repository Spring Data cho {@link Customer} của biến thể G1V3NN.
+ *
+ * <p>Tên có tiền tố {@code G1V3NN} vì tên bean Spring phải duy nhất trong toàn ứng dụng (các biến thể và G0 đều có
+ * entity trùng tên class). Chỉ dùng ở bước WHEN của test khi cần, không dùng để assert dữ liệu.
+ */
+public interface G1V3NNCustomerRepository extends JpaRepository<Customer, Long> {
+}
