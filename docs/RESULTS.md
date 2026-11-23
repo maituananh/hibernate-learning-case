@@ -74,3 +74,9 @@ theo cột **Thực tế**, không theo trí nhớ. Dòng nào cột Thực tế
 | G9-S08 | Hai bản D cùng `@Version`, lưu bản 2 | `ObjectOptimisticLockingFailureException` | Đúng khi lưu qua `repository.save` (Spring dịch exception). **Gọi thẳng `em.merge` thì ném `jakarta.persistence.OptimisticLockException`** (merge so version ngay lúc gọi, không qua proxy `@Repository` nên không được dịch). DB giữ bản 1, version = 1 | Khớp khi qua repository; **KHÁC** khi dùng `em` trực tiếp | Hibernate 7.4.15.Final |
 | G9-S09 | Chuyển item A → B: `A.removeItem` + `B.addItem` trong cùng tx (A và B đều `orphanRemoval`) | Chưa rõ (item có thể bị orphanRemoval xoá) | Item **không bị xoá**: 0 DELETE, 1 UPDATE `order_item` (đổi `order_id`), 2 UPDATE `purchase_order`; cả hai version tăng 0 → 1; total A = 10.00, B = 55.00 | Khớp một trong hai khả năng: **không** xoá | Hibernate 7.4.15.Final |
 | G9-S11 | `@SoftDelete` trên `OrderItem`: `remove`, collection của cha, orphanRemoval | `remove` = UPDATE cờ; collection tự lọc; orphanRemoval cũng soft | Đúng cả ba: 0 DELETE, 1 UPDATE `deleted = true`, dòng còn trong bảng; SELECT nạp collection có điều kiện `deleted`; orphanRemoval cũng chỉ đặt cờ | Khớp | Hibernate 7.4.15.Final |
+| G6-S12 | `optional = false` trên `@OneToOne` (phía owning và inverse) | DDL `NOT NULL`, `inner join`; đặt ở phía inverse không giúp LAZY | **Chưa chạy**: tình huống ➕ ngoài phạm vi Phase 8, không có test | Chưa kiểm chứng | — |
+
+## Kiểm tra cuối (Phase 12)
+
+Đã đối chiếu mọi tình huống 🔬 trong [02-SCENARIOS](02-SCENARIOS.md) với bảng trên: **mọi 🔬 đều có kết quả và version Hibernate**, trừ G6-S12 (ghi rõ "chưa chạy" ở dòng cuối).
+Các dòng cột "Khớp?" in đậm **KHÁC** giả thuyết: G1-S04b, G1-S04d/e, G1-S10, G3-S10a, G4-S06, G5-S10a, G5-S12a, G5-S13c, G6-S10a, G6-S10b, G6-S13a, G8-S04a, G8-S04b, G8-S07, G9-S02b, G9-S08.
