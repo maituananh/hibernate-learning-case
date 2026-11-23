@@ -1,0 +1,33 @@
+# Cấu hình CHUNG cho mọi test. File này nằm ở classpath test nên che hoàn toàn
+# src/main/resources/application.yml khi chạy test (không gộp).
+# Datasource KHÔNG khai báo ở đây: Testcontainers cung cấp qua @ServiceConnection,
+# còn profile `inspect` (application-inspect.yml) trỏ vào Postgres của docker compose.
+spring:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        # BẮT BUỘC: mỗi biến thể mapping nằm trong 1 schema Postgres riêng (g1_v4_..., ...).
+        # Không bật thì Hibernate không tự `create schema`, và việc tạo bảng sẽ báo lỗi.
+        hbm2ddl:
+          create_namespaces: true
+        format_sql: true
+        # Cố ý KHÔNG đặt jdbc.batch_size và default_batch_fetch_size:
+        # bật toàn cục sẽ làm thay đổi số câu SQL mà các test cần đếm chính xác.
+      # Xuất DDL ra file để đọc lại: build/ddl/create.sql
+      jakarta:
+        persistence:
+          schema-generation:
+            scripts:
+              action: create
+              create-target: build/ddl/create.sql
+
+logging:
+  level:
+    # Câu SQL Hibernate gửi đi, và giá trị tham số (bind) của từng câu.
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    # Câu SQL chạy qua JdbcTemplate (dùng để assert dữ liệu thật và trong smoke test).
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG

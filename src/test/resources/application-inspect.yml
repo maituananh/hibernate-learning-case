@@ -1,0 +1,13 @@
+# Profile `inspect`: chạy test vào Postgres của docker compose để GIỮ LẠI dữ liệu sau test.
+# Bật bằng:  docker compose up -d && ./gradlew test -Pinspect --rerun
+# (không dùng -Dspring.profiles.active vì Gradle fork JVM riêng, cờ đó không truyền sang)
+# Khi profile này bật, Testcontainers không chạy (xem TestcontainersConfiguration).
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/hibernate_lab
+    username: hibernate_lab
+    password: hibernate_lab
+  jpa:
+    hibernate:
+      # `create` (không phải create-drop) để schema và dữ liệu còn nguyên sau khi test kết thúc.
+      ddl-auto: create
