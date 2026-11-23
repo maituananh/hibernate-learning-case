@@ -67,6 +67,7 @@ Không viết assert theo trí nhớ. Chạy ở chế độ quan sát (in SQL +
 
 ## Quy trình
 
+- **Trước khi bắt đầu phase mới:** chuyển sang nhánh `main` và pull code mới nhất (`git checkout main && git pull`). Luôn bắt đầu implement phase mới từ nhánh `main` (đã cập nhật), không tạo nhánh phase từ nhánh phase trước hay từ trạng thái HEAD detached.
 - Làm từng phase theo 03-PHASES. **Dừng chờ người học duyệt** ở 2 checkpoint: (1) sau golden test G0-S01 (Phase 1), (2) sau khi xong G1 (Phase 3).
 - Cuối mỗi phase: chạy toàn bộ suite, báo số test xanh/đỏ, liệt kê 🔬 khác giả thuyết, cập nhật README của nhóm.
 - Bắt đầu triển khai từng phase của dự án theo thứ tự 03-PHASES. **Mỗi phase commit đúng 1 lần**, sau khi suite xanh và README nhóm đã cập nhật. Không gộp nhiều phase vào một commit, không commit giữa chừng khi phase chưa xong. Message theo dạng `feat(phase-N): <tên phase>` (hoặc `chore`/`docs` nếu phù hợp).
