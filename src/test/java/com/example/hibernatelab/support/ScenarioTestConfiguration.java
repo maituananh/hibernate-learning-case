@@ -20,7 +20,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 	"com.example.hibernatelab.g0_lifecycle", // Phase 2: G0
 	"com.example.hibernatelab.g1_owning_side", // Phase 3: G1 (9 biến thể, mỗi biến thể một sub-package và một schema)
 	"com.example.hibernatelab.g2_cascade", // Phase 4: G2 (10 biến thể C0…C8 + C4-DEEP, mỗi biến thể một sub-package và một schema)
-	"com.example.hibernatelab.g3_orphan_removal" // Phase 5: G3 (3 biến thể O0, O1, O2, mỗi biến thể một sub-package và một schema)
+	"com.example.hibernatelab.g3_orphan_removal", // Phase 5: G3 (3 biến thể O0, O1, O2, mỗi biến thể một sub-package và một schema)
+	"com.example.hibernatelab.g4_update_child_via_parent" // Phase 6: G4 (6 biến thể U0…U5, mỗi biến thể một sub-package và một schema)
 })
 public class ScenarioTestConfiguration {
 
