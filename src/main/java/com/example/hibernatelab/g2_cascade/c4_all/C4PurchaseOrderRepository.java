@@ -1,0 +1,10 @@
+package com.example.hibernatelab.g2_cascade.c4_all;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+/**
+ * Repository Spring Data cho {@link C4PurchaseOrder}. Tên có tiền tố C4 vì tên bean Spring phải duy nhất trong toàn ứng dụng.
+ * Chỉ dùng ở bước WHEN của test khi cần (ví dụ G2-S09, S13), không dùng để assert dữ liệu.
+ */
+public interface C4PurchaseOrderRepository extends JpaRepository<C4PurchaseOrder, Long> {
+}
