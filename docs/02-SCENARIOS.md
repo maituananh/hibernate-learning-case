@@ -786,3 +786,14 @@ Bảng **annotation → tình huống** nằm ở [cuối file](#coverage).
 | `@BatchSize`, `@Fetch(SUBSELECT)`, `@EntityGraph`, `JOIN FETCH` | G5-S06..S12 |
 | `@OrderColumn` | G7-S06 |
 | Vòng đời T/M/D/R, flush, `merge`, `getReference`, `save()` | G0 (toàn bộ), và có mặt trong mọi tình huống |
+
+### Kết quả đối chiếu coverage (Phase 12)
+
+Đã đối chiếu cả 130 mã tình huống trong file này với `src/test`: **127 mã có test xanh**, mọi annotation trong bảng trên đều có ít nhất một test.
+Ba mã ➕ không có test riêng, không làm hụt annotation nào:
+
+- **G6-S12** (`optional = false` trên `@OneToOne`): ngoài phạm vi Phase 8; `optional = false` trên `@ManyToOne` đã được test ở G1-S04c/d.
+- **G7-S14** (khi nào bỏ `@ManyToMany`): chỉ là ghi chú, nằm trong README nhóm G7.
+- **G9-S10** (batch insert SEQUENCE vs IDENTITY): cần `hibernate.jdbc.batch_size` toàn cục (trái quy ước) và thư viện đếm batch; để tuỳ chọn.
+
+Tra cứu theo annotation: [CHEATSHEET.md](CHEATSHEET.md).
