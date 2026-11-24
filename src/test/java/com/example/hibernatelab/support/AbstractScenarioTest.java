@@ -2,6 +2,7 @@ package com.example.hibernatelab.support;
 
 import java.util.function.Supplier;
 
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.PersistenceContext;
 
 /**
@@ -43,6 +45,10 @@ public abstract class AbstractScenarioTest {
 	@Autowired
 	protected SchemaInspector schema;
 
+	/** Dùng để lấy SessionFactory: Statistics (G13), StatelessSession, cache cấp 2. */
+	@Autowired
+	protected EntityManagerFactory emf;
+
 	@Autowired
 	private DbCleaner dbCleaner;
 
@@ -62,6 +68,11 @@ public abstract class AbstractScenarioTest {
 		if (schemas.length > 0) {
 			dbCleaner.truncateAllTablesIn(schemas);
 		}
+		// TRUNCATE chỉ xoá dòng trong DB, KHÔNG xoá second-level cache (G13): nếu không evict, test sau có thể
+		// "thấy" entity còn sót trong cache của test trước. evictAllRegions() xoá cả cache entity, collection lẫn query.
+		// Với test cũ (không entity nào @Cacheable) lệnh này là no-op.
+		emf.unwrap(SessionFactory.class).getCache().evictAllRegions();
+		emf.unwrap(SessionFactory.class).getStatistics().clear();
 		sql.reset();
 	}
 

@@ -87,6 +87,11 @@ public class SqlAssert {
 		assertThat(actual).as(message("SELECT", table, expected)).isEqualTo(expected);
 	}
 
+	/** Số lần Hibernate đã gọi {@code nextval} của sequence (assertTotal/assertInserts… bỏ qua chúng). */
+	public int sequenceCalls() {
+		return captor.sequenceCallCount();
+	}
+
 	/** Tổng số câu SQL (không tính nextval). */
 	public void assertTotal(int expected) {
 		assertThat(captor.statements().size())

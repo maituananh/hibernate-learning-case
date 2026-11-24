@@ -27,6 +27,13 @@ dependencies {
 	testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
 	testImplementation 'org.testcontainers:testcontainers-postgresql'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// G13 (second-level cache, E3): Hibernate nói chuyện với cache qua chuẩn JCache (JSR-107).
+	// `hibernate-jcache` là cầu nối, Caffeine JCache là provider thật (chọn Caffeine vì không cần file XML cấu hình
+	// và không kéo theo JAXB như Ehcache). Chỉ dùng cho test nên khai báo testImplementation.
+	// Version hibernate-jcache PHẢI trùng version hibernate-core (lấy từ BOM của Spring Boot).
+	testImplementation 'org.hibernate.orm:hibernate-jcache'
+	testImplementation 'com.github.ben-manes.caffeine:jcache:3.2.3'
 }
 
 // ─────────────────────────────────────────────────────────────────────────

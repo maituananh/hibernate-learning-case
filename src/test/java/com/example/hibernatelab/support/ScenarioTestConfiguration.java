@@ -1,5 +1,13 @@
 package com.example.hibernatelab.support;
 
+import java.net.URI;
+import java.util.Properties;
+import java.util.UUID;
+
+import javax.cache.CacheManager;
+import javax.cache.Caching;
+import javax.cache.spi.CachingProvider;
+
 import org.springframework.boot.hibernate.autoconfigure.HibernatePropertiesCustomizer;
 import org.springframework.boot.persistence.autoconfigure.EntityScan;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -30,13 +38,33 @@ import org.springframework.transaction.PlatformTransactionManager;
 	"com.example.hibernatelab.g9_integrated", // Phase 11: G9 (tình huống tổng hợp S01…S11, mỗi tình huống một sub-package và một schema; có thêm service)
 	"com.example.hibernatelab.g10_query", // Phase 13: G10 (truy vấn & persistence context: Q1 baseline dùng chung cho mọi tình huống, Q2 thêm @Version cho S06)
 	"com.example.hibernatelab.g11_tx_lock", // Phase 14: G11 (transaction & khoá: T1 baseline có tồn kho + service, T2 thêm @Version, T3 hàng đợi job; có service layer),
-	"com.example.hibernatelab.g12_advanced_model" // Phase 15: G12 (mô hình dữ liệu nâng cao: E1 embeddable, C1 element collection, H1/H2/H3 inheritance, N1 natural id, V1 converter/enum, F1 formula/restriction/filter)
+	"com.example.hibernatelab.g12_advanced_model", // Phase 15: G12 (mô hình dữ liệu nâng cao: E1 embeddable, C1 element collection, H1/H2/H3 inheritance, N1 natural id, V1 converter/enum, F1 formula/restriction/filter)
+	"com.example.hibernatelab.g13_performance" // Phase 16: G13a (hiệu năng & cache: B1/B2/B3 batch & id, P1 persistence context & StatelessSession, K1…K4 second-level cache)
 })
 public class ScenarioTestConfiguration {
 
 	@Bean
 	SqlCaptor sqlCaptor() {
 		return new SqlCaptor();
+	}
+
+	/**
+	 * Mỗi Spring context một {@link CacheManager} RIÊNG cho second-level cache (G13).
+	 *
+	 * <p>BẪY: nếu để Hibernate tự lấy, mọi SessionFactory trong cùng JVM dùng CHUNG một CacheManager mặc định. Suite có nhiều
+	 * Spring context (cấu hình khác nhau); khi một context đóng nó đóng luôn CacheManager chung, các context còn lại sẽ gặp
+	 * {@code IllegalStateException} ("cache closed") ngay lúc evict. URI khác nhau ⇒ provider tạo manager khác nhau.
+	 */
+	@Bean(destroyMethod = "close")
+	CacheManager labCacheManager() {
+		CachingProvider provider = Caching.getCachingProvider("com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider");
+		return provider.getCacheManager(URI.create("urn:hibernate-lab:" + UUID.randomUUID()), provider.getDefaultClassLoader(),
+			new Properties());
+	}
+
+	@Bean
+	HibernatePropertiesCustomizer cacheManagerCustomizer(CacheManager labCacheManager) {
+		return properties -> properties.put("hibernate.javax.cache.cache_manager", labCacheManager);
 	}
 
 	/**
