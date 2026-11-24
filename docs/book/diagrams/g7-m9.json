@@ -1,0 +1,1 @@
+{ "id": "g7-m9", "schema": "g7_m9_join_entity_surrogate", "tables": ["product", "stock_item", "warehouse"] }

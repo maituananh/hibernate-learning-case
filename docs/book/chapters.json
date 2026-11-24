@@ -115,7 +115,7 @@
       "extra": [
         "G6-S12"
       ],
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "08",
@@ -129,7 +129,7 @@
       "extra": [
         "G7-S14"
       ],
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "09",
@@ -141,7 +141,7 @@
         "G8-S01..S07"
       ],
       "extra": [],
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "10",
@@ -154,7 +154,7 @@
         "G12-S04..S09"
       ],
       "extra": [],
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "phan-3",

@@ -1,0 +1,1 @@
+{ "id": "g12-h1", "schema": "g12_h1_single_table", "tables": ["payment", "receipt"] }

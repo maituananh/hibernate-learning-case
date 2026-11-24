@@ -1,0 +1,1 @@
+{ "id": "g7-m4", "schema": "g7_m4_no_mappedby", "tables": ["product", "product_tags", "tag_products", "tag"] }

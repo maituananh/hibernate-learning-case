@@ -1,0 +1,1 @@
+{ "id": "g6-v3", "schema": "g6_v3_bidi_owner_card", "tables": ["customer", "loyalty_card"] }

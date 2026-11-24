@@ -1,0 +1,1 @@
+{ "id": "g12-h3", "schema": "g12_h3_table_per_class", "tables": ["card_payment", "bank_payment"] }

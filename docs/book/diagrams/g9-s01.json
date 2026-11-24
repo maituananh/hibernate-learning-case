@@ -1,0 +1,1 @@
+{ "id": "g9-s01", "schema": "g9_s01_category_tree", "tables": ["category", "product"] }
