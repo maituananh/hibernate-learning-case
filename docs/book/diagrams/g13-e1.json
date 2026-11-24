@@ -1,0 +1,1 @@
+{ "id": "g13-e1", "schema": "g13_e1_inverse_one_to_one", "tables": ["customer", "loyalty_card"] }
