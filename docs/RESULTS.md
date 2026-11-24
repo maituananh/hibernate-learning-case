@@ -141,3 +141,8 @@ theo cột **Thực tế**, không theo trí nhớ. Dòng nào cột Thực tế
 
 Đã đối chiếu mọi tình huống 🔬 trong [02-SCENARIOS](02-SCENARIOS.md) với bảng trên: **mọi 🔬 đều có kết quả và version Hibernate**, trừ G6-S12 (ghi rõ "chưa chạy" ở dòng cuối).
 Các dòng cột "Khớp?" in đậm **KHÁC** giả thuyết: G1-S04b, G1-S04d/e, G1-S10, G3-S10a, G4-S06, G5-S10a, G5-S12a, G5-S13c, G6-S10a, G6-S10b, G6-S13a, G8-S04a, G8-S04b, G8-S07, G9-S02b, G9-S08; giai đoạn mở rộng: G10-S01a (so với kinh nghiệm Hibernate 5), G10-S08a (một nửa), G10-S09b, G11-S01b, G11-S11, G12-S06a (Hibernate không tự nới `nullable` ở lớp con SINGLE_TABLE), G12-S11a/b (converter phát hiện sửa tại chỗ, không phụ thuộc `equals`), G13-S09a (query cache không cần SELECT từng entity dù entity không được cache), G14-I2-S01 (triệu chứng thực tế là bán quá số hàng và kho ghi sai, không phải kho âm).
+
+## Kiểm tra cuối giai đoạn mở rộng (Phase 19)
+
+Đã đối chiếu lại danh sách "KHÁC giả thuyết" ở trên với cột "Khớp?" của bảng: **không có dòng nào lệch danh sách**, và mọi 🔬 của G10–G14 đều có kết quả kèm version Hibernate (7.4.15.Final).
+Tổng cộng 25 mã KHÁC giả thuyết trên toàn lab (16 ở G1–G9, 9 ở G10–G14). Hai mã ➕ của G14 (I5, R3) không làm nên không có dòng ở đây.

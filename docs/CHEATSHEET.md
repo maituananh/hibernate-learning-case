@@ -9,7 +9,10 @@ Mục lục: [`@ManyToOne`](#manytoone) · [`@OneToMany`](#onetomany) · [`mappe
 [`@JoinColumn`](#joincolumn) · [`@JoinColumns`](#joincolumns) · [`@JoinTable`](#jointable) · [`FetchType`](#fetchtype) · [`CascadeType`](#cascadetype) ·
 [`orphanRemoval`](#orphanremoval) · [`@MapsId`](#mapsid) · [`@EmbeddedId` / `@IdClass`](#embeddedid--idclass) · [`@OnDelete`](#ondelete) ·
 [`@Version` / `@OptimisticLock` / `LockModeType`](#version--optimisticlock--lockmodetype) · [`@DynamicUpdate`](#dynamicupdate) ·
-[`@BatchSize` / `@Fetch` / `@EntityGraph` / `JOIN FETCH`](#batchsize--fetch--entitygraph--join-fetch) · [`@OrderColumn`](#ordercolumn) · [`@SoftDelete`](#softdelete)
+[`@BatchSize` / `@Fetch` / `@EntityGraph` / `JOIN FETCH`](#batchsize--fetch--entitygraph--join-fetch) · [`@OrderColumn`](#ordercolumn) · [`@SoftDelete`](#softdelete) ·
+[`@Embeddable`](#embeddable--attributeoverride) · [`@ElementCollection`](#elementcollection) · [`@Inheritance`](#inheritance) · [`@NaturalId`](#naturalid) · [`AttributeConverter` / `@Enumerated`](#attributeconverter--enumerated) · [`@Formula` / `@SQLRestriction` / `@Filter`](#formula--sqlrestriction--filter) · [`@Transactional`](#transactional-readonly-propagation-rollbackfor) · [Khoá pessimistic](#lockmodetypepessimistic_--skip-locked--deadlock) · [Batch / `StatelessSession`](#batch-insert--allocationsize--statelesssession) · [Cache cấp 2](#cacheable--cache--query-cache) · [Bytecode enhancement](#bytecode-enhancement)
+
+> Mười một bảng cuối (từ `@Embeddable`) thuộc giai đoạn mở rộng G10–G13.
 
 ---
 
@@ -224,12 +227,138 @@ Mục lục: [`@ManyToOne`](#manytoone) · [`@OneToMany`](#onetomany) · [`mappe
 
 ---
 
+## `@Embeddable` / `@AttributeOverride`
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | Không có: field kiểu value object bị coi là không map được. |
+| **Đặt ở phía nào** | `@Embeddable` trên class giá trị; `@Embedded` ở entity chủ; `@AttributeOverride` khi nhúng cùng một class từ hai lần trở lên. |
+| **Ảnh hưởng DDL** | Không có bảng riêng; cột của embeddable nằm phẳng trong bảng chủ (`billing_city`, `shipping_city`, …). |
+| **Ảnh hưởng SQL/runtime** | Sửa field tại chỗ (`setCity`) → 1 UPDATE nhờ dirty checking. Mọi cột đều NULL thì đọc lại ra `null` chứ không phải object rỗng. |
+| **Bẫy hay gặp** | Nhúng hai lần mà thiếu override → `MappingException: Column 'city' is duplicated` lúc khởi động. Một cột khác NULL thì object tồn tại, field còn lại `null`. |
+| **Mã tình huống** | G12-S01..S03 |
+
+## `@ElementCollection`
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | Không có: `List<String>` không phải quan hệ, phải khai `@ElementCollection`. |
+| **Đặt ở phía nào** | Trên collection của kiểu cơ bản hoặc embeddable; không phải entity. |
+| **Ảnh hưởng DDL** | Bảng con riêng với FK về cha; kiểu bag (`List` không `@OrderColumn`) **không có PK**; `Set` có PK `(cha, giá trị)`; `@OrderColumn` có PK `(cha, vị trí)`. |
+| **Ảnh hưởng SQL/runtime** | Bag: bỏ 1 phần tử → DELETE cả collection rồi INSERT lại phần còn lại (recreate). `Set`/`@OrderColumn`: DELETE đúng dòng. Entity con (`@OneToMany`): DELETE theo id. |
+| **Bẫy hay gặp** | Dùng `List` mặc định là bẫy recreate. Cần sửa hoặc xoá từng phần tử, hay phần tử có logic riêng → dùng entity con. |
+| **Mã tình huống** | G12-S04, S05 |
+
+## `@Inheritance`
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | `SINGLE_TABLE`. |
+| **Đặt ở phía nào** | Trên lớp cha của cây kế thừa (`@Entity`). |
+| **Ảnh hưởng DDL** | `SINGLE_TABLE`: 1 bảng + cột phân biệt, cột riêng của lớp con phải nullable. `JOINED`: 1 bảng mỗi lớp, PK lớp con cũng là FK, giữ được NOT NULL. `TABLE_PER_CLASS`: 1 bảng mỗi lớp cụ thể, lớp cha trừu tượng không có bảng. |
+| **Ảnh hưởng SQL/runtime** | Query đa hình: `SINGLE_TABLE` 1 SELECT không join; `JOINED` 1 SELECT với `left join` tới mọi lớp con; `TABLE_PER_CLASS` 1 SELECT `union all`. |
+| **Bẫy hay gặp** | `SINGLE_TABLE` mà đặt `nullable = false` ở cột lớp con thì INSERT của lớp con khác vỡ. `@ManyToOne LAZY` tới lớp cha cho proxy của lớp CHA: `instanceof` lớp con sai cho tới khi `Hibernate.unproxy`. |
+| **Mã tình huống** | G12-S06..S09 |
+
+## `@NaturalId`
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | Không có: Hibernate chỉ biết khoá chính. |
+| **Đặt ở phía nào** | Trên field định danh nghiệp vụ (ví dụ `sku`). |
+| **Ảnh hưởng DDL** | Thêm unique constraint trên cột đó. |
+| **Ảnh hưởng SQL/runtime** | `byNaturalId` lần 1: 1 SELECT `where sku=?`; lần 2 trong cùng persistence context: 0 SELECT, cùng instance. |
+| **Bẫy hay gặp** | Mặc định bất biến: đổi giá trị đã lưu → exception `An immutable natural identifier … was altered`, DB giữ giá trị cũ. Cần đổi thì `@NaturalId(mutable = true)`. |
+| **Mã tình huống** | G12-S10 |
+
+## `AttributeConverter` / `@Enumerated`
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | Enum lưu `ORDINAL` (số thứ tự). |
+| **Đặt ở phía nào** | `@Convert` trên field (hoặc `@Converter(autoApply)`); `@Enumerated(EnumType.STRING)` trên enum. |
+| **Ảnh hưởng DDL** | `ORDINAL` → `smallint` + check `between …`; `STRING` → `varchar` + check `in (…)`. |
+| **Ảnh hưởng SQL/runtime** | Sửa object do converter trả về tại chỗ vẫn 1 UPDATE, dù có `equals` hay không. |
+| **Bẫy hay gặp** | Đổi thứ tự (hoặc chèn giữa) enum đang lưu `ORDINAL` → dữ liệu cũ đọc sai **im lặng**, check constraint không cứu được. Dữ liệu sống lâu dùng `STRING`. |
+| **Mã tình huống** | G12-S11 |
+
+## `@Formula` / `@SQLRestriction` / `@Filter`
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | Không có. |
+| **Đặt ở phía nào** | `@Formula` trên field; `@SQLRestriction` trên entity hoặc collection; `@Filter` định nghĩa ở entity, bật theo session. |
+| **Ảnh hưởng DDL** | `@Formula` không có cột trong bảng. |
+| **Ảnh hưởng SQL/runtime** | `@Formula` chỉ tính lại khi tải lại entity, không tự cập nhật trong cùng persistence context. `@SQLRestriction` luôn thêm điều kiện, kể cả `find`. `@Filter` chưa bật thì không lọc. |
+| **Bẫy hay gặp** | `@SQLRestriction` không áp cho native query. `@Filter` **không** áp cho `find` theo id nên không phải rào bảo mật. `@SQLRestriction` trên collection chỉ lọc lúc nạp collection. |
+| **Mã tình huống** | G12-S12..S14 |
+
+## `@Transactional` (`readOnly`, propagation, `rollbackFor`)
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | `REQUIRED`, `readOnly = false`, chỉ `RuntimeException`/`Error` mới rollback. |
+| **Đặt ở phía nào** | Trên method hoặc class của service (không trên test, xem quy ước lab). |
+| **Ảnh hưởng DDL** | Không có. |
+| **Ảnh hưởng SQL/runtime** | `readOnly`: flush mode MANUAL, sửa entity không sinh UPDATE. `REQUIRED` lồng nhau dùng chung transaction; `REQUIRES_NEW` có transaction và persistence context riêng. |
+| **Bẫy hay gặp** | Method B ném lỗi thì cả transaction chung bị đánh dấu rollback-only, A có `catch` vẫn `UnexpectedRollbackException`. Checked exception không rollback nếu thiếu `rollbackFor`. `readOnly` + id `SEQUENCE` → Postgres từ chối `nextval()`. Không OSIV thì chạm lazy ngoài transaction → `LazyInitializationException`. |
+| **Mã tình huống** | G11-S01..S04, S12 |
+
+## `LockModeType.PESSIMISTIC_*` / `SKIP LOCKED` / deadlock
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | Không khoá; đọc xong có thể bị tx khác ghi đè (lost update). |
+| **Đặt ở phía nào** | `em.find(…, lockMode)` / `Query.setLockMode` / `@Lock` ở repository; timeout qua hint `jakarta.persistence.lock.timeout`. |
+| **Ảnh hưởng DDL** | Không có. |
+| **Ảnh hưởng SQL/runtime** | `PESSIMISTIC_WRITE` → `for no key update of <alias>`; `PESSIMISTIC_READ` → `for share`. Timeout 0 thêm `nowait` (lỗi ngay); `SKIP LOCKED` cho hàng đợi việc. Ba cách chống lost update: `@Version` (retry), khoá (xếp hàng), `UPDATE … stock = stock - 1` (bỏ qua persistence context). |
+| **Bẫy hay gặp** | Khoá hai dòng theo thứ tự ngược nhau → deadlock (Postgres huỷ đúng một tx, mất khoảng 1 giây); khoá theo thứ tự id thì tránh được. `PESSIMISTIC_WRITE` + `left join fetch` không lỗi nhưng thành 2 câu SQL, có khoảng hở và item không bị khoá. Worker không khoá nhận cùng một việc (job chạy hai lần). |
+| **Mã tình huống** | G11-S05..S11 |
+
+## Batch insert / `allocationSize` / `StatelessSession`
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | Không batch: mỗi entity một INSERT; `SEQUENCE` `allocationSize = 50`. |
+| **Đặt ở phía nào** | Batch size đặt theo session (`session.setJdbcBatchSize(n)`) hoặc toàn cục (`hibernate.jdbc.batch_size`, lab không bật); `allocationSize` ở `@SequenceGenerator`. |
+| **Ảnh hưởng DDL** | `allocationSize` phải khớp bước tăng của sequence trong DB. |
+| **Ảnh hưởng SQL/runtime** | Batch cần id không phải `IDENTITY` **và** batch size được bật; `IDENTITY` thì INSERT chạy ngay tại `persist`. `allocationSize = 50` → 100 entity chỉ 2 lần `nextval`. Xử lý nhiều dòng: `flush()` rồi `clear()` theo lô. `StatelessSession`: không dirty checking, cascade, lazy loading. |
+| **Bẫy hay gặp** | Quên `flush()` trước `clear()` thì mất cập nhật. `SqlCaptor` chỉ thấy 1 INSERT cho cả lô (các lô dùng lại một PreparedStatement), phải đếm bằng log batch. |
+| **Mã tình huống** | G13-S01..S05 |
+
+## `@Cacheable` / `@Cache` / query cache
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | Không cache cấp 2 (trong lab: `ENABLE_SELECTIVE`, chỉ entity `@Cacheable` mới vào cache). |
+| **Đặt ở phía nào** | `@Cacheable` + `@Cache(usage = …)` trên entity hoặc collection; `setCacheable(true)` trên query. |
+| **Ảnh hưởng DDL** | Không có. |
+| **Ảnh hưởng SQL/runtime** | Lần đọc thứ hai (tx khác): 0 SELECT. Bulk JPQL tự evict đúng vùng; native phải khai `addSynchronizedEntityClass`, nếu không xoá toàn bộ cache. Cache collection chỉ giữ id: phần tử không cache thì vẫn N SELECT. |
+| **Bẫy hay gặp** | Sửa DB bằng SQL/JDBC tay → cache entity và query cache trả dữ liệu cũ. `READ_ONLY` mà sửa entity → lỗi lúc commit. Chỉ cache dữ liệu ít đổi và chỉ ghi qua Hibernate. |
+| **Mã tình huống** | G13-S06..S10 |
+
+## Bytecode enhancement
+
+| Mục | Nội dung |
+|---|---|
+| **Mặc định** | Tắt. Annotation LAZY ở phía inverse `@OneToOne` và `@Basic(fetch = LAZY)` bị bỏ qua lặng lẽ. |
+| **Đặt ở phía nào** | Plugin Gradle `org.hibernate.orm` cho cả source set (lab: chỉ ở subproject `lab-enhanced/`). |
+| **Ảnh hưởng DDL** | Không có. |
+| **Ảnh hưởng SQL/runtime** | Có enhancement: `@OneToOne(mappedBy, LAZY)` và `@Basic(fetch = LAZY)` mới thật sự lazy; dirty tracking không làm UPDATE ngắn đi (vẫn ghi mọi cột nếu không `@DynamicUpdate`). |
+| **Bẫy hay gặp** | Áp cho **mọi** entity của source set nên dễ đổi kết quả test cũ; bytecode chạy khác source đã đọc. Bật khi đã đo được vấn đề, không bật mặc định. Inverse `@OneToOne` không có thẻ vẫn tốn 1 SELECT. |
+| **Mã tình huống** | G13-S11..S13 |
+
+---
+
 ## Phạm vi chưa làm
 
-Theo [02-SCENARIOS](02-SCENARIOS.md#coverage), ba tình huống ➕ chưa có test riêng và **không** ảnh hưởng độ phủ annotation (annotation liên quan đã được test ở tình huống khác):
+Theo [02-SCENARIOS](02-SCENARIOS.md#coverage), sáu mã ➕ không có test riêng và **không** làm hụt annotation nào (annotation liên quan đã được test ở tình huống khác):
 
 | Mã | Lý do |
 |---|---|
 | G6-S12 `optional = false` trên `@OneToOne` | Ngoài phạm vi Phase 8. Phần `optional = false` trên `@ManyToOne` đã có (G1-S04c/d). |
 | G7-S14 Khi nào bỏ `@ManyToMany` | Chỉ là ghi chú, nằm trong README nhóm G7 (mục S14). |
-| G9-S10 Batch insert SEQUENCE vs IDENTITY | Cần `hibernate.jdbc.batch_size` toàn cục (trái quy ước) và thư viện đếm batch; để tuỳ chọn. |
+| G9-S10 Batch insert SEQUENCE vs IDENTITY | Cần `hibernate.jdbc.batch_size` toàn cục (trái quy ước) nên không làm ở G9; **đã được làm bằng cách khác ở G13-S01..S03** (batch size đặt theo session, đếm lô bằng `BatchLogCapture`). |
+| G14-I5 Admin sửa giá nhưng khách vẫn thấy giá cũ | Người học chốt chỉ làm ⭐ ở Phase 18. Nền kiến thức đã có ở G13-S06b, S07, S09c. |
+| G14-R3 Đọc Hibernate `Statistics` để chẩn đoán | Như trên (chỉ ⭐). `Statistics` đã được dùng để đo cache ở G13. |
+| G14-D1, G14-D2 | Không phải test: là tài liệu [LEAD-PLAYBOOK.md](LEAD-PLAYBOOK.md) và [adr/](adr/README.md), đã làm. |

@@ -1,6 +1,6 @@
 # hibernate-learning-case
 
-Lab học **Hibernate mapping quan hệ** (`@ManyToOne`, `@OneToMany`, `@OneToOne`, `@ManyToMany`, cascade, `orphanRemoval`, fetch, `@MapsId`, …).
+Lab học **Hibernate mapping quan hệ** (`@ManyToOne`, `@OneToMany`, `@OneToOne`, `@ManyToMany`, cascade, `orphanRemoval`, fetch, `@MapsId`, …), rồi mở rộng sang truy vấn, transaction/khoá, mô hình nâng cao, hiệu năng và tình huống của người dẫn dắt team.
 Mỗi tình huống mapping là **một test chạy trên PostgreSQL thật**, chứng minh được bốn thứ:
 
 1. **DDL** Hibernate sinh ra,
@@ -14,7 +14,8 @@ Stack: Java 21, Spring Boot, Hibernate 7.4.15.Final, PostgreSQL 17 (Testcontaine
 
 ```bash
 ./gradlew test                                  # toàn bộ suite (Testcontainers tự dựng Postgres)
-./gradlew test --tests 'G1*'                    # một nhóm (G0 … G9)
+./gradlew test --tests 'G1*'                    # một nhóm (G0 … G14; 'G1*' khớp cả G1, G10…G14)
+./gradlew :lab-enhanced:test                    # chỉ subproject bytecode enhancement (G13b)
 ./gradlew test --tests '*G1V4*'                 # một class
 ./gradlew test --tests '*G1V4*s12*'             # một tình huống (method s12_…)
 ./gradlew test --rerun                          # chạy lại khi code không đổi
@@ -34,13 +35,16 @@ Lưu ý:
 
 | Chỉ số | Giá trị |
 |---|---|
-| Số test | **249** (50 class), 0 lỗi, 0 bỏ qua |
-| Thời gian chạy | khoảng **19 giây** trên máy phát triển (Postgres container đã sẵn) |
+| Số test | **365**: 357 ở project gốc (73 class) + 8 ở subproject `lab-enhanced/` (1 class); 0 lỗi, 0 bỏ qua |
+| Thời gian chạy | `./gradlew test --rerun` mất khoảng **32 giây** tổng (khoảng 21 giây test project gốc + 7 giây subproject, phần còn lại là khởi động Gradle/Testcontainers; Postgres image đã có sẵn) trên máy phát triển |
 | Hibernate | 7.4.15.Final |
+
+Lần chạy đầu tiên trên máy mới lâu hơn vì phải kéo image Postgres. Các test chậm nhất là deadlock (G11-S10a, khoảng 1 giây vì `deadlock_timeout`) và batch 2 000 dòng (G13-S04).
 
 ## Lộ trình đọc
 
-Đọc theo thứ tự G0 → G9. Mỗi nhóm có README riêng (bảng biến thể, so sánh A vs B, kết quả đã xác minh, DDL trích ra).
+Đọc theo thứ tự G0 → G9 (phần lõi về mapping quan hệ), sau đó G10 → G14 (giai đoạn mở rộng: truy vấn, transaction/khoá, mô hình nâng cao, hiệu năng, tình huống của lead).
+Mỗi nhóm có README riêng (bảng biến thể, so sánh A vs B, kết quả đã xác minh, DDL trích ra).
 
 | Nhóm | Chủ đề | Số test | README |
 |---|---|---|---|
@@ -54,6 +58,11 @@ Lưu ý:
 | G7 | `@ManyToMany`, `@JoinTable`, join entity | 29 | [g7_many_to_many](src/test/java/com/example/hibernatelab/g7_many_to_many/README.md) |
 | G8 | `@JoinColumns`, PK ghép, derived identity | 13 | [g8_composite_fk](src/test/java/com/example/hibernatelab/g8_composite_fk/README.md) |
 | G9 | Tình huống tổng hợp có service layer | 32 | [g9_integrated](src/test/java/com/example/hibernatelab/g9_integrated/README.md) |
+| G10 | `join` vs `join fetch`, native query, `Page` + fetch | 16 | [g10_query](src/test/java/com/example/hibernatelab/g10_query/README.md) |
+| G11 | `@Transactional`, lost update, khoá pessimistic, deadlock, OSIV | 21 | [g11_tx_lock](src/test/java/com/example/hibernatelab/g11_tx_lock/README.md) |
+| G12 | `@Embeddable`, `@ElementCollection`, `@Inheritance`, `@NaturalId`, converter, `@Formula`/`@SQLRestriction`/`@Filter` | 28 | [g12_advanced_model](src/test/java/com/example/hibernatelab/g12_advanced_model/README.md) |
+| G13 | Batch, persistence context, cache cấp 2 (G13a) và bytecode enhancement (G13b, subproject `lab-enhanced/`) | 29 (21 + 8) | [g13_performance](src/test/java/com/example/hibernatelab/g13_performance/README.md) |
+| G14 | Sự cố tổng hợp (tái hiện → chẩn đoán → sửa → rào chắn), ngân sách SQL, lint Metamodel | 22 | [g14_lead](src/test/java/com/example/hibernatelab/g14_lead/README.md) |
 
 Phần còn lại (1 smoke test + 16 test của hạ tầng `support/`) kiểm tra chính các công cụ của lab (`SqlCaptor`, `assertState`, …).
 
@@ -61,10 +70,12 @@ Phần còn lại (1 smoke test + 16 test của hạ tầng `support/`) kiểm t
 
 | File | Nội dung |
 |---|---|
-| [docs/CHEATSHEET.md](docs/CHEATSHEET.md) | **Mỗi annotation một bảng**: mặc định, đặt ở phía nào, ảnh hưởng DDL, ảnh hưởng SQL, bẫy hay gặp, mã tình huống. Đọc sau khi xong G0–G9 để ôn. |
+| [docs/CHEATSHEET.md](docs/CHEATSHEET.md) | **Mỗi annotation một bảng**: mặc định, đặt ở phía nào, ảnh hưởng DDL, ảnh hưởng SQL, bẫy hay gặp, mã tình huống. Đọc sau khi xong G0–G13 để ôn (có cả annotation của giai đoạn mở rộng). |
 | [docs/RESULTS.md](docs/RESULTS.md) | Kết quả thực tế của các tình huống 🔬 (khác giả thuyết thì in đậm). |
+| [docs/LEAD-PLAYBOOK.md](docs/LEAD-PLAYBOOK.md) | Checklist review PR có JPA và bảng quyết định G0–G13, mỗi dòng trỏ mã tình huống. |
+| [docs/adr/](docs/adr/README.md) | 5 ADR mẫu (quan hệ LAZY, cấm cascade REMOVE trên `@ManyToOne`, optimistic lock mặc định, tắt OSIV, danh sách đọc bằng DTO). |
 | [docs/CONVENTIONS.md](docs/CONVENTIONS.md) | Checklist khi viết một tình huống mới. |
-| [docs/00-PROMPT.md](docs/00-PROMPT.md) … [03-PHASES.md](docs/03-PHASES.md) | Yêu cầu, quyết định thiết kế, danh sách tình huống, các phase. |
+| [docs/00-PROMPT.md](docs/00-PROMPT.md) … [04-EXTENSION-DESIGN.md](docs/04-EXTENSION-DESIGN.md) | Yêu cầu, quyết định thiết kế, danh sách tình huống (G0–G14), các phase (0–19), thiết kế giai đoạn mở rộng. |
 
 ## Cách đọc một test
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Trạng thái hiện tại
 
-Phase 0–12 (G0–G9) và Phase 13–18 (G10–G14, kèm `docs/LEAD-PLAYBOOK.md` và `docs/adr/`) đã xong; còn Phase 19 (tổng kết giai đoạn mở rộng). Khi bắt đầu implement, đọc theo thứ tự:
+Toàn bộ Phase 0–19 (G0–G14, kèm `docs/LEAD-PLAYBOOK.md`, `docs/adr/` và tổng kết giai đoạn mở rộng) đã xong: 365 test xanh. Khi bắt đầu implement, đọc theo thứ tự:
 
 - [docs/00-PROMPT.md](docs/00-PROMPT.md): yêu cầu hoàn chỉnh, định dạng test bắt buộc, danh sách "Không được làm".
 - [docs/01-DESIGN.md](docs/01-DESIGN.md): quyết định kỹ thuật D1–D18, cấu trúc project, quy ước (§7), rủi ro (§9).
