@@ -49,6 +49,8 @@ Bảng này tóm tắt ý của mục 25.2 để bạn so nhanh. Cột "khi nào
 
 Có hai nhận xét rút ra từ bảng. Thứ nhất, các công cụ không loại trừ nhau: nhiều dự án dùng Hibernate cho thao tác ghi theo mô hình nghiệp vụ, và `JdbcTemplate` hoặc jOOQ cho báo cáo nặng, nơi persistence context chỉ gây thêm việc. Thứ hai, ba cột giữa của bảng chính là ba câu hỏi bạn nên tự đặt trước khi chọn: *ai kiểm soát câu SQL, ai theo dõi thay đổi của đối tượng, và khi nào dữ liệu liên quan được tải*. Cả cuốn sách này xoay quanh ba câu hỏi đó.
 
+Muốn biến bảng so sánh này thành quyết định cho từng yêu cầu cụ thể, và biết bug nào xuất hiện khi kết hợp JPA với MyBatis, hãy đọc tiếp Chương 26.
+
 ### 25.4 Lộ trình học tiếp
 
 ::: {.chua-kiem-chung}

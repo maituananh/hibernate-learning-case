@@ -393,6 +393,16 @@
       "status": "done"
     },
     {
+      "id": "26",
+      "file": "073-chuong-26-chon-cong-cu-dung-luc.md",
+      "kind": "chapter",
+      "number": 26,
+      "title": "Dùng JPA/Hibernate và MyBatis đúng lúc",
+      "scenarios": [],
+      "extra": [],
+      "status": "done"
+    },
+    {
       "id": "phu-luc",
       "file": "090-phu-luc.md",
       "kind": "part",

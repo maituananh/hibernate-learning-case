@@ -88,3 +88,6 @@ Sách giữ nguyên thuật ngữ kỹ thuật tiếng Anh vì bạn sẽ gặp 
 | statement inspector | Điểm móc của Hibernate cho phép nhìn (và sửa) mọi câu SQL trước khi gửi; lab dùng để đếm SQL. | 1.4 |
 | Testcontainers | Thư viện chạy PostgreSQL thật trong Docker cho test. | Phụ lục E |
 | ADR | Architecture Decision Record: tài liệu ngắn ghi một quyết định kỹ thuật và lý do. | 23.4 |
+| MyBatis mapper | Interface (hoặc file XML) khai báo câu SQL bạn tự viết và cách ánh xạ kết quả sang object; không theo dõi trạng thái object. | 26.5 |
+| resultMap | Khai báo của MyBatis về cách ánh xạ cột của kết quả truy vấn sang field của object, kể cả quan hệ lồng nhau. | 26.5 |
+| session cache (local cache) | Cache kết quả truy vấn theo session của MyBatis, bị xóa khi update, commit, rollback hoặc close; không phải persistence context. | 26.5, 26.6.7 |
