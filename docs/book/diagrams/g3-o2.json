@@ -1,0 +1,1 @@
+{ "id": "g3-o2", "schema": "g3_o2_orphan_no_cascade", "tables": ["purchase_order", "order_item", "item_discount"] }
