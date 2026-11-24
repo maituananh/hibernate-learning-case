@@ -107,7 +107,10 @@ export function lintChapter(md, chapter, index) {
       add(h.lineNo, 'template', `tình huống thiếu {.cot-loi} hoặc {.mo-rong}: ${h.text}`);
       continue;
     }
-    const required = [...(h.cls === 'cot-loi' ? CORE_LABELS : EXTRA_LABELS), '::: {.ghi-nho}', '::: {.tracuu'];
+    // Chương không có scenarios (Chương 24, 25) chỉ dẫn nguồn tài liệu, không có mã tình huống
+    // để tra cứu, nên không đòi khung Tra cứu.
+    const hasScenarios = (chapter.scenarios ?? []).length > 0;
+    const required = [...(h.cls === 'cot-loi' ? CORE_LABELS : EXTRA_LABELS), '::: {.ghi-nho}', ...(hasScenarios ? ['::: {.tracuu'] : [])];
     const missing = required.filter((label) => !text.includes(label));
     if (missing.length > 0) add(h.lineNo, 'template', `thiếu ${missing.join(', ')}: ${h.text}`);
     const tiers = divCodes(text, 'tracuu').map((code) => index.get(code)?.tier).filter(Boolean);

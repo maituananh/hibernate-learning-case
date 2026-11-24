@@ -108,6 +108,39 @@ test('template: heading 4 thiếu class', () => {
   assert.ok(rules(VALID.replace(' {.cot-loi}', '')).includes('template'));
 });
 
+const ch24 = {
+  id: '24', file: '071-chuong-24-ngoai-lab.md', kind: 'chapter', number: 24,
+  title: 'Tình huống thực tế chưa có trong lab', scenarios: [], extra: [], status: 'done',
+};
+const NO_TRACUU = `## Chương 24. Tình huống thực tế chưa có trong lab
+
+### 24.1 Flyway
+
+#### 24.1.1 Thay ddl-auto bằng migration {.mo-rong}
+
+**Bối cảnh.** A.
+
+**Kết quả.** B.
+
+::: {.ghi-nho}
+C.
+:::
+`;
+
+test('template: chương không có scenarios cho phép tình huống mở rộng không có khung Tra cứu', () => {
+  assert.deepEqual(lintChapter(NO_TRACUU, ch24, index), []);
+});
+
+test('template: chương có scenarios vẫn bắt buộc khung Tra cứu', () => {
+  const chapter = { ...ch24, scenarios: ['G1-S12'] };
+  assert.deepEqual(lintChapter(NO_TRACUU, chapter, index).map((i) => i.rule), ['template']);
+});
+
+test('template: chương không có scenarios vẫn bắt buộc Ghi nhớ', () => {
+  const broken = NO_TRACUU.replace(/::: \{\.ghi-nho\}\nC\.\n:::\n/, '');
+  assert.deepEqual(lintChapter(broken, ch24, index).map((i) => i.rule), ['template']);
+});
+
 test('variant-section: mục biến thể thiếu ưu nhược điểm hoặc hình', () => {
   assert.deepEqual(rules(VALID.replace('**Nhược điểm.** Phải đồng bộ hai phía.\n', '')), ['variant-section']);
   assert.deepEqual(rules(VALID.replace(/!\[.*\n/, '')), ['variant-section']);

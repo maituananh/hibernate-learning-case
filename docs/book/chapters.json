@@ -380,7 +380,7 @@
       "extra": [
         "G14-I5"
       ],
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "25",
@@ -390,7 +390,7 @@
       "title": "Hibernate so với các công cụ khác và lộ trình học tiếp",
       "scenarios": [],
       "extra": [],
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "phu-luc",
