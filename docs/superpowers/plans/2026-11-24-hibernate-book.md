@@ -23,6 +23,8 @@
 - Bìa: nội dung nguyên văn spec 8.8, Author **Mai Tuấn Anh**.
 - `REPO_URL = https://github.com/maituananh/hibernate-learning-case`; link file: `${REPO_URL}/blob/main/<path>`, link thư mục: `${REPO_URL}/tree/main/<dir>`, PR: `${REPO_URL}/pull/<n>`.
 - Kết luận lấy từ assert trong test và `docs/RESULTS.md`, **không** lấy giả thuyết của `docs/02-SCENARIOS.md`.
+- **Mức chi tiết (người học yêu cầu):** tình huống Cốt lõi viết chi tiết, Bối cảnh nêu tình huống đời thực, Vì sao giải thích từng bước; Phần II (Chương 4 đến 10) và Phần III (Chương 11 đến 13) viết chi tiết nhất. Xem spec 7.2a.
+- **JPA thuần:** tình huống nào dùng API hoặc annotation riêng của Hibernate thì thêm đoạn `**Trong JPA thuần.**` (cách viết tương đương, hoặc "JPA không có cách tương đương"). Xem spec 7.2b. Chương 1 sẽ có mục 1.5 và sách có Phụ lục G (Task 15).
 - Commit chỉ ở các bước "Commit" của plan (người học đã đồng ý khi duyệt plan). Message dạng `docs(book): ...`, kết thúc bằng `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 
 ## Review Focus
@@ -606,7 +608,7 @@ Nếu pandoc không giữ footer hoặc `titlePg` từ reference, viết thêm `
 1. **Test thất bại trước:** đổi `status` của chương thành `"done"` trong `chapters.json`, chạy `node tools/lint.mjs --chapter <id>`, kỳ vọng FAIL với danh sách mã `coverage` còn thiếu.
 2. **Đọc nguồn**, theo thứ tự: README của nhóm; **method test** của từng mã (xem `index.json`); assert là sự thật, không lấy từ 02-SCENARIOS. Sau đó đọc entity trong `entityPackages`, các dòng `RESULTS.md` liên quan, và `build/book/evidence/<code>.md`.
 3. **Sơ đồ:** mỗi mục `.bien-the` có ít nhất một `docs/book/diagrams/<nhóm>-<biến thể>.json` (id viết thường, ví dụ `g1-v4`; schema lấy theo README nhóm). Chạy `node tools/diagrams.mjs`, rồi xem PNG bằng Read tool.
-4. **Viết** theo khuôn spec mục 7 và cú pháp Markdown ở đầu plan:
+4. **Viết** theo khuôn spec mục 7 (mức chi tiết 7.2a, bổ sung JPA 7.2b) và cú pháp Markdown ở đầu plan. Mẫu mức chi tiết: Chương 4, 2, 3 đã commit. Đoạn "Trong JPA thuần." là run-in label `**Trong JPA thuần.**` đặt sau `**Vì sao.**`:
    - Code entity chép từ source, đổi tab sang 4 khoảng trắng, mỗi dòng tối đa 85 ký tự, bỏ header comment dài và getter/setter không liên quan.
    - Code ví dụ rút gọn từ test: giữ GIVEN, WHEN và `inTx(...)`; bỏ assert và lệnh in.
    - SQL và bảng dữ liệu chép từ evidence. Bảng "Trước" và "Sau" in đậm giá trị đổi, kèm hai dòng "Thay đổi: ..." và "Giữ nguyên: ...". Không đưa id cụ thể vào kết luận.
@@ -893,6 +895,7 @@ Dàn ý:
 - [ ] **Step 2: Phụ lục B**: mỗi dòng "KHÁC" trong `RESULTS.md` gồm: điều nhiều người nghĩ, điều thực tế xảy ra, mục trong sách.
 - [ ] **Step 3: Phụ lục C**: chỉ chứa `::: {.phu-luc-c}` `:::`. Kiểm tra bảng sinh ra có đủ mọi mã trong index.
 - [ ] **Step 4: Phụ lục D**: lấy từ `gh pr list --state all --limit 40 --json number,title,url,body`. Mỗi PR có số, tiêu đề, một dòng nội dung, URL.
+- [ ] **Step 4b: Chương 1 mục 1.5 và Phụ lục G.** Thêm vào `011-chuong-01-mo-hinh-mau.md` mục `### 1.5 JPA và Hibernate: cùng một việc, hai cách viết` (bảng `EntityManager` và `Session`, JPQL và HQL, `jakarta.persistence` và `org.hibernate.annotations`; quy ước ví dụ). Viết Phụ lục G (`097-phu-luc-g-jpa-hibernate.md`): quét toàn sách tìm mọi đoạn `**Trong JPA thuần.**` và API riêng của Hibernate, lập bảng đối chiếu kèm mục trong sách. Bổ sung entry `pl-g` vào `chapters.json` (đã có sẵn).
 - [ ] **Step 5: Phụ lục E** (lấy từ `README.md` gốc và CLAUDE.md: lệnh Gradle, `--rerun`, `-Pinspect`, docker compose, `lab-enhanced`); **Phụ lục F** (mọi thuật ngữ tiếng Anh đã dùng, nghĩa tiếng Việt, mục gặp lần đầu).
 - [ ] **Step 6: Lời nói đầu**: sách dành cho ai; 4 bằng chứng; cách đọc một tình huống (kèm một ví dụ đã thu nhỏ); ý nghĩa các nhãn và các khung; hai lộ trình đọc (người mới thì Phần I đến III theo thứ tự; người đang gặp sự cố thì vào Chương 22 và Phụ lục C); version; cách cập nhật mục lục trong Word.
 - [ ] **Step 7: Kiểm tra cuối**: mọi chương `done`; `npm test` PASS; `docs/book/build.sh --evidence` PASS (chạy lại suite để evidence mới nhất). `node tools/lint.mjs` không lỗi, và không mã nào thiếu hoặc bị gán trùng. Nếu có PDF thì xem lướt toàn bộ và ghi lại số trang.

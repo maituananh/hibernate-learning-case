@@ -107,6 +107,7 @@ không in vào mục lục.
 | | D. Danh sách Pull Request | 20 PR, tiêu đề, nội dung, URL | |
 | | E. Cách chạy lab | Lệnh Gradle, `--rerun`, `-Pinspect`, docker compose, subproject `lab-enhanced` | |
 | | F. Bảng thuật ngữ | Thuật ngữ tiếng Anh, nghĩa tiếng Việt, chương gặp lần đầu | |
+| | G. Đối chiếu JPA và Hibernate | Mọi API hoặc annotation riêng của Hibernate dùng trong sách, kèm cách viết tương đương trong JPA thuần (hoặc ghi "không có trong JPA") | |
 
 Mọi mã tình huống có test xanh (mã dạng `G<N>-...` trong `@DisplayName`; bỏ qua test hạ tầng và smoke test) phải xuất hiện
 ít nhất một lần trong sách (ô "Tra cứu" hoặc Phụ lục C).
@@ -150,6 +151,24 @@ Tra cứu             Khung riêng (xem 8.6).
 
 Nếu `RESULTS.md` ghi "KHÁC" cho tình huống này thì thêm khung **"Kết quả khác dự đoán"**: điều nhiều người nghĩ, điều thực tế
 xảy ra, version đã kiểm chứng.
+
+### 7.2a Mức chi tiết (người học yêu cầu sau khi duyệt chương mẫu và Phần I)
+
+Người đọc là dev đã dùng Hibernate nhưng chưa hiểu sâu, nên **viết ngắn gây khó hiểu hơn viết dài**. Quy tắc chung:
+
+- **Tình huống Cốt lõi:** phần **Bối cảnh** nêu một tình huống đời thực (code người ta hay viết, vì sao dễ nhầm, lỗi lộ ra ở đâu và khi nào). Phần **Vì sao** giải thích cơ chế từng bước (Hibernate làm gì ở persist, flush, commit), có thể kèm số liệu cụ thể. Không dùng một câu để giải thích điều cần cả đoạn.
+- **Phần II (Chương 4 đến 10) và Phần III (Chương 11 đến 13) là quan trọng nhất**, được dùng thường xuyên trong công việc: viết ở mức chi tiết cao nhất, mỗi tình huống Cốt lõi nên có Bối cảnh và Vì sao nhiều đoạn, ví dụ code đủ để người đọc tự chạy lại ý tưởng.
+- **Tình huống Mở rộng** vẫn có thể ngắn (Bối cảnh, Kết quả, Ghi nhớ, Tra cứu).
+- Không sợ sách dài. Ưu tiên người đọc hiểu ngay tình huống.
+
+### 7.2b Bổ sung "viết trong JPA thuần" (người học yêu cầu)
+
+Trong công việc thực tế người ta thường viết bằng JPA (`jakarta.persistence`, `EntityManager`, JPQL, Spring Data JPA) hơn là API riêng của Hibernate. Vì vậy:
+
+1. **Chương 1 có mục "JPA và Hibernate: cùng một việc, hai cách viết"** (mục 1.5): bảng đối chiếu `EntityManager` và `Session`, JPQL và HQL, annotation `jakarta.persistence` và `org.hibernate.annotations`, và quy ước của sách (ví dụ nào là JPA thuần, ví dụ nào cần Hibernate).
+2. **Mỗi tình huống dùng API hoặc annotation riêng của Hibernate** (ví dụ `Hibernate.isInitialized`, `session.byNaturalId`, `@BatchSize`, `@OnDelete`, `@DynamicUpdate`, `@Formula`, `StatelessSession`) có thêm một đoạn ngắn **"Trong JPA thuần."**: cách viết tương đương hoặc cách làm gần nhất, hoặc ghi rõ "JPA không có cách tương đương".
+3. Ví dụ code đã dùng `EntityManager` (`em.persist`, `em.find`) là JPA thuần; ghi chú một lần ở mục 1.5 để không lặp lại.
+4. **Phụ lục G** liệt kê toàn bộ các điểm trên ở một bảng tra cứu.
 
 ### 7.3 Tình huống "Mở rộng" (➕ trong lab): viết ngắn
 
@@ -402,6 +421,8 @@ câu mô tả bằng chữ nằm ở caption của hình trong Markdown. Font c�
 11. File .docx không commit; nằm ở `build/book/`.
 12. Chương mẫu là Chương 4; checkpoint duy nhất bắt buộc là sau chương mẫu, sau đó báo cáo cuối mỗi Phần.
 13. Tên sách và nội dung trang bìa như 8.8.
+14. Mức chi tiết cao hơn cho tình huống Cốt lõi, cao nhất ở Phần II và III (7.2a).
+15. Thêm mục 1.5 ở Chương 1, đoạn "Trong JPA thuần" ở các tình huống dùng API riêng của Hibernate, và Phụ lục G (7.2b).
 
 ## 14. Để lại cho người thực hiện
 
@@ -451,6 +472,10 @@ chỉ nhắc ngắn; tập trung vào vì sao và hậu quả trong DB.
 Spring Data JDBC, MyBatis, jOOQ, Querydsl; lộ trình học tiếp; phụ lục tra cứu annotation, kết quả khác dự đoán, bảng tình
 huống, danh sách PR, cách chạy lab, thuật ngữ.
 
-**Độ dài.** Không giới hạn; ưu tiên rõ ràng, ví dụ cụ thể để người đọc hiểu ngay.
+**Độ dài.** Không giới hạn; ưu tiên rõ ràng, ví dụ cụ thể để người đọc hiểu ngay. Viết ngắn gây khó hiểu hơn viết dài.
+
+**Mức chi tiết.** Tình huống Cốt lõi: Bối cảnh nêu tình huống đời thực dễ nhầm; Vì sao giải thích cơ chế từng bước. Phần II và III (quan hệ giữa các bảng, đọc dữ liệu) là phần dùng thường xuyên nhất nên viết chi tiết nhất. Tình huống Mở rộng có thể ngắn.
+
+**JPA và Hibernate.** Người đọc thực tế viết bằng JPA. Có mục 1.5 đối chiếu JPA và Hibernate ở Chương 1, đoạn "Trong JPA thuần." ở mỗi tình huống dùng API riêng của Hibernate, và Phụ lục G tổng hợp.
 
 **Cách làm.** Theo thiết kế ở mục 6–12 của tài liệu này: viết chương mẫu (Chương 4), dừng cho người học duyệt, rồi viết tiếp.
