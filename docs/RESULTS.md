@@ -127,8 +127,17 @@ theo cột **Thực tế**, không theo trí nhớ. Dòng nào cột Thực tế
 | G13-S13a | Dirty tracking: sửa một cột, UPDATE chứa cột nào | Chưa rõ | **Cả 3 cột** (`set description=?,name=?,price=?`): dirty tracking chỉ đổi cách phát hiện thay đổi, không thu hẹp câu UPDATE (cần `@DynamicUpdate`) | Quan sát | Hibernate 7.4.15.Final |
 | G13-S13b | Như S13a nhưng không enhancement | (đối chứng) | Câu UPDATE giống hệt S13a | Quan sát | Hibernate 7.4.15.Final |
 | G13-S13c | Entity enhance chỉ đọc, không sửa | (không có giả thuyết trước) | Không có UPDATE | Quan sát | Hibernate 7.4.15.Final |
+| G14-I1-S01 | Trang 10 đơn đọc entity rồi duyệt `customer` và `items` | 22 SELECT (2 + 2N) | Đúng: 22 SELECT | Khớp | Hibernate 7.4.15.Final |
+| G14-I1-S03 | DTO projection `select new` có `size(o.items)` + `countQuery` | 2 SELECT | Đúng: 2 SELECT, `size()` thành subquery đếm | Khớp | Hibernate 7.4.15.Final |
+| G14-I2-S01 | Flash sale kho 10, hai khách mua 6, không `@Version` | Tồn kho âm | **Kho không âm**: kho ghi 4, bán ra 12, không exception (kho + đã bán = 16 ≠ 10) | **KHÁC** (triệu chứng) | Hibernate 7.4.15.Final |
+| G14-I2-S03 | `@Version` + retry ngoài transaction | Người sau bị chặn đúng | Đúng: lần đầu `ObjectOptimisticLockingFailureException`, retry đọc kho 4 → `InsufficientStockException`; 1 đơn, kho 4, version 1 | Khớp | Hibernate 7.4.15.Final |
+| G14-I3-S01 | Hai worker, query lấy việc không khoá | Cùng nhận một việc | Đúng: `email_log` 2 dòng cho việc 1, việc 2 vẫn NEW | Khớp | Hibernate 7.4.15.Final |
+| G14-I3-S03 | `PESSIMISTIC_WRITE` + `SKIP LOCKED` | Mỗi worker một việc | Đúng: A việc 1, B việc 2 (SQL có `skip locked`) | Khớp | Hibernate 7.4.15.Final |
+| G14-I4-S01 | Import 200 dòng, id `IDENTITY`, không `flush`/`clear` | 200 INSERT, persistence context 200 entity | Đúng | Khớp | Hibernate 7.4.15.Final |
+| G14-I4-S03 | `SEQUENCE` + `setJdbcBatchSize(50)` + `flush`/`clear` mỗi 50 | 4 lô × 50, persistence context ≤ 50 | Đúng: lô `[50, 50, 50, 50]`, persistence context lớn nhất 50 | Khớp | Hibernate 7.4.15.Final |
+| G14-R2-S02 | Lint mapping trên entity cố ý sai | Bắt cả 4 quy tắc | Đúng: EAGER to-one (`@ManyToOne`, `@OneToOne`), EAGER collection (`@OneToMany`, `@ManyToMany`), cascade REMOVE (`@ManyToOne`, `@ManyToMany`), `IDENTITY` | Khớp | Hibernate 7.4.15.Final |
 
 ## Kiểm tra cuối (Phase 12)
 
 Đã đối chiếu mọi tình huống 🔬 trong [02-SCENARIOS](02-SCENARIOS.md) với bảng trên: **mọi 🔬 đều có kết quả và version Hibernate**, trừ G6-S12 (ghi rõ "chưa chạy" ở dòng cuối).
-Các dòng cột "Khớp?" in đậm **KHÁC** giả thuyết: G1-S04b, G1-S04d/e, G1-S10, G3-S10a, G4-S06, G5-S10a, G5-S12a, G5-S13c, G6-S10a, G6-S10b, G6-S13a, G8-S04a, G8-S04b, G8-S07, G9-S02b, G9-S08; giai đoạn mở rộng: G10-S01a (so với kinh nghiệm Hibernate 5), G10-S08a (một nửa), G10-S09b, G11-S01b, G11-S11, G12-S06a (Hibernate không tự nới `nullable` ở lớp con SINGLE_TABLE), G12-S11a/b (converter phát hiện sửa tại chỗ, không phụ thuộc `equals`), G13-S09a (query cache không cần SELECT từng entity dù entity không được cache).
+Các dòng cột "Khớp?" in đậm **KHÁC** giả thuyết: G1-S04b, G1-S04d/e, G1-S10, G3-S10a, G4-S06, G5-S10a, G5-S12a, G5-S13c, G6-S10a, G6-S10b, G6-S13a, G8-S04a, G8-S04b, G8-S07, G9-S02b, G9-S08; giai đoạn mở rộng: G10-S01a (so với kinh nghiệm Hibernate 5), G10-S08a (một nửa), G10-S09b, G11-S01b, G11-S11, G12-S06a (Hibernate không tự nới `nullable` ở lớp con SINGLE_TABLE), G12-S11a/b (converter phát hiện sửa tại chỗ, không phụ thuộc `equals`), G13-S09a (query cache không cần SELECT từng entity dù entity không được cache), G14-I2-S01 (triệu chứng thực tế là bán quá số hàng và kho ghi sai, không phải kho âm).

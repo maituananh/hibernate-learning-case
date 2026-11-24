@@ -134,6 +134,18 @@ public class ConcurrentTx {
 	}
 
 	/**
+	 * Chạy {@code work} ở thread nền nhưng KHÔNG mở transaction bao ngoài. Dùng cho code tự quản lý transaction của mình
+	 * (service có {@code TransactionTemplate}/{@code @Transactional}, G14).
+	 *
+	 * <p>Vì sao cần: {@link #start(Runnable)} bọc work trong một transaction; transaction của service sẽ THAM GIA vào đó
+	 * (propagation REQUIRED), nên commit/rollback và lỗi khi commit xảy ra ở transaction ngoài chứ không ở service, và
+	 * vòng retry bên trong service không bắt được gì. Muốn mô phỏng đúng một lời gọi service từ bên ngoài thì dùng hàm này.
+	 */
+	public Running<Void> startOutsideTx(Runnable work) {
+		return new Running<>(CompletableFuture.runAsync(work, executor));
+	}
+
+	/**
 	 * Chờ (có timeout, thăm dò bằng Awaitility chứ không phải {@code Thread.sleep} rải rác) đến khi Postgres báo
 	 * có ít nhất một session đang CHỜ KHOÁ ({@code wait_event_type = 'Lock'}). Dùng để chắc chắn transaction thứ hai
 	 * thực sự đã bị chặn trước khi transaction thứ nhất nhả khoá.

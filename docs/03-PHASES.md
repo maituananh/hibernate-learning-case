@@ -27,7 +27,7 @@
 | 15 | G12 — Mô hình dữ liệu nâng cao | ✅ 14 tình huống (S01–S14), 28 test |
 | 16 | G13a — Hiệu năng & cache ở project gốc | Đầu phase: 249 test cũ không đổi số SQL |
 | 17 | G13b — Bytecode enhancement (subproject `lab-enhanced/`) | Đầu phase: suite cũ xanh sau khi chuyển `support/` sang `testFixtures` |
-| 18 | G14 — Lead: sự cố tổng hợp & rào chắn | ⏸ **Dừng trước khi viết sự cố, chốt danh sách với người học** |
+| 18 | G14 — Lead: sự cố tổng hợp & rào chắn | ✅ 4 sự cố I1–I4 (16 test), R1 (3 test), R2 (3 test), `LEAD-PLAYBOOK.md`, 5 ADR; người học chốt chỉ làm phần ⭐ |
 | 19 | Tổng kết giai đoạn mở rộng | ✅ Bàn giao |
 
 > Phase 13–19 thuộc **giai đoạn mở rộng**, thiết kế chi tiết ở [04-EXTENSION-DESIGN.md](04-EXTENSION-DESIGN.md) (§7 là bảng phase đầy đủ).
