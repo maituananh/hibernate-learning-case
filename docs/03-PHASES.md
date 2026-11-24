@@ -23,7 +23,7 @@
 | 11 | G9 — Tình huống tổng hợp (service layer) | 6 / 11 | |
 | 12 | Tổng kết: RESULTS, CHEATSHEET, coverage | — | ✅ Bàn giao |
 | 13 | Cập nhật tài liệu, danh sách G10–G14, rồi G10 — Truy vấn & persistence context | ⏸ **Dừng sau golden test G10-S01** |
-| 14 | G11 — Transaction & khoá (+ helper chạy song song) | |
+| 14 | G11 — Transaction & khoá (+ helper chạy song song) | ✅ 12 tình huống (S01–S12), 21 test |
 | 15 | G12 — Mô hình dữ liệu nâng cao | |
 | 16 | G13a — Hiệu năng & cache ở project gốc | Đầu phase: 249 test cũ không đổi số SQL |
 | 17 | G13b — Bytecode enhancement (subproject `lab-enhanced/`) | Đầu phase: suite cũ xanh sau khi chuyển `support/` sang `testFixtures` |
