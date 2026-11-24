@@ -1,0 +1,1 @@
+{ "id": "g5-f3", "schema": "g5_f3_batch_size", "tables": ["customer", "purchase_order"] }

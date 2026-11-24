@@ -1,0 +1,1 @@
+{ "id": "g9-s03", "schema": "g9_s03a_hash_by_id", "tables": ["purchase_order", "order_item"] }

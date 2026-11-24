@@ -1,0 +1,5 @@
+# Metadata cho pandoc. Không đặt "title"/"author" vì pandoc sẽ in thêm một khối tiêu đề ở đầu file;
+# trang bìa đã có ở chapters/000-bia-va-muc-luc.md. title-meta/author-meta chỉ ghi vào thuộc tính của file .docx.
+title-meta: Hibernate Mapping in Practice
+author-meta: Mai Tuấn Anh
+lang: vi-VN

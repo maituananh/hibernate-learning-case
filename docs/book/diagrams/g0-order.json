@@ -1,0 +1,1 @@
+{ "id": "g0-order", "schema": "g0_lifecycle", "tables": ["customer", "purchase_order"] }

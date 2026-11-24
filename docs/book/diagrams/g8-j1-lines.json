@@ -1,0 +1,1 @@
+{ "id": "g8-j1-lines", "schema": "g8_j1_explicit", "tables": ["shipment", "shipment_line", "shipment_line_note"] }

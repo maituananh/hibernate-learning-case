@@ -20,3 +20,6 @@ bin/
 # Khác
 HELP.md
 .DS_Store
+
+# Công cụ build sách (docs/book): thư viện Node cài bằng npm, không commit
+docs/book/node_modules/

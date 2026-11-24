@@ -1,0 +1,1 @@
+{ "id": "g2-c6", "schema": "g2_c6_remove_on_m2o", "tables": ["purchase_order", "order_item", "product"] }

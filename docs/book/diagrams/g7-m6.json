@@ -1,0 +1,1 @@
+{ "id": "g7-m6", "schema": "g7_m6_order_column", "tables": ["product", "product_tag", "tag"] }

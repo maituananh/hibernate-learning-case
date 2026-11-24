@@ -1,0 +1,1 @@
+{ "id": "g6-v2", "schema": "g6_v2_fk_on_card", "tables": ["customer", "loyalty_card"] }

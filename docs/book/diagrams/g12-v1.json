@@ -1,0 +1,1 @@
+{ "id": "g12-v1", "schema": "g12_v1_converter", "tables": ["v1_product", "v1_review_ordinal", "v1_review_string"] }

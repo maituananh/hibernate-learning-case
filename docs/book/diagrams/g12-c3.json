@@ -1,0 +1,1 @@
+{ "id": "g12-c3", "schema": "g12_c1_element_collection", "tables": ["c3_order", "c3_order_label", "c4_order", "c4_order_step"] }

@@ -1,0 +1,1 @@
+{ "id": "g4-u4", "schema": "g4_u4_dynamic_update", "tables": ["purchase_order", "order_item"] }

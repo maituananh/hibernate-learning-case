@@ -1,0 +1,1 @@
+{ "id": "g3-o1", "schema": "g3_o1_orphan", "tables": ["purchase_order", "order_item", "item_discount"] }

@@ -1,0 +1,1 @@
+{ "id": "g1-v2", "schema": "g1_v2_o2m_uni_jointable", "tables": ["customer", "customer_orders", "purchase_order"] }

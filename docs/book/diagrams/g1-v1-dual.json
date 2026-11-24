@@ -1,0 +1,1 @@
+{ "id": "g1-v1-dual", "schema": "g1_v1_m2o_uni", "tables": ["customer", "order_dual_mapping"] }

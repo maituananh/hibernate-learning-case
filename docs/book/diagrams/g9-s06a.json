@@ -1,0 +1,1 @@
+{ "id": "g9-s06a", "schema": "g9_s06a_cascade_remove", "tables": ["customer", "purchase_order", "order_item"] }

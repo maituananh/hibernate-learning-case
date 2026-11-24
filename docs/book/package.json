@@ -1,0 +1,13 @@
+{
+  "name": "hibernate-book",
+  "private": true,
+  "type": "module",
+  "description": "Công cụ build sách Hibernate Mapping in Practice từ lab",
+  "scripts": {
+    "test": "node --test \"tools/test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "2.6.2",
+    "jszip": "3.10.1"
+  }
+}

@@ -1,0 +1,1 @@
+{ "id": "g11-t1", "schema": "g11_t1_baseline", "tables": ["product", "audit_log", "purchase_order", "order_item"] }

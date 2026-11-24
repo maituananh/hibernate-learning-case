@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.hibernatelab.g1_owning_side.G1V4BidirectionalTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-24T05:18:33.229Z" hostname="host" time="0.077">
+  <properties/>
+  <testcase name="G1-S12 | V4 chỉ add vào collection (&quot;inverse&quot;) → customer_id = NULL" classname="com.example.hibernatelab.g1_owning_side.G1V4BidirectionalTest" time="0.013">
+    <system-out><![CDATA[2026-11-24T12:18:33.251+07:00 DEBUG 94411 --- [    Test worker] org.hibernate.SQL                        :
+    select
+        nextval('g1_v4_bidi_mappedby.purchase_order_seq')
+2026-11-24T12:18:33.255+07:00 DEBUG 94411 --- [    Test worker] org.hibernate.SQL                        :
+    insert
+    into
+        g1_v4_bidi_mappedby.purchase_order
+        (customer_id, order_no, id)
+    values
+        (?, ?, ?)
+2026-11-24T12:18:33.255+07:00 TRACE 94411 --- [    Test worker] org.hibernate.orm.jdbc.bind              : binding parameter (1:BIGINT) <- [3]
+2026-11-24T12:18:33.255+07:00 TRACE 94411 --- [    Test worker] org.hibernate.orm.jdbc.bind              : binding parameter (2:VARCHAR) <- [A-001]
+2026-11-24T12:18:33.255+07:00 TRACE 94411 --- [    Test worker] org.hibernate.orm.jdbc.bind              : binding parameter (3:BIGINT) <- [3]
+[LIFECYCLE] PurchaseOrder → MANAGED
+[SQL] Hibernate đã chạy từ lần reset():
+  select c1_0.id,c1_0.name from g1_v4_bidi_mappedby.customer c1_0 where c1_0.id=?
+  select nextval('g1_v4_bidi_mappedby.purchase_order_seq')   (nextval: lấy id từ sequence, KHÔNG tính khi assert)
+  insert into g1_v4_bidi_mappedby.purchase_order (customer_id,order_no,id) values (?,?,?)
+  select o1_0.customer_id,o1_0.id,o1_0.order_no from g1_v4_bidi_mappedby.purchase_order o1_0 where o1_0.customer_id=?
+2026-11-24T12:18:33.269+07:00 DEBUG 94411 --- [    Test worker] o.s.jdbc.core.JdbcTemplate               : Executing SQL query [select * from g1_v4_bidi_mappedby.purchase_order]
+[DB] g1_v4_bidi_mappedby.purchase_order (1 dòng)
+  | customer_id | id | order_no |
+  +-------------+----+----------+
+  | null        | 3  | A-001    |
+]]></system-out>
+  </testcase>
+  <testcase name="G1-S13 | V4 chỉ setCustomer &amp; DB đúng" classname="com.example.hibernatelab.g1_owning_side.G1V4BidirectionalTest" time="0.011">
+    <system-out><![CDATA[[LIFECYCLE] Customer → MANAGED
+chuỗi có ]]]]><![CDATA[> ở giữa
+]]></system-out>
+  </testcase>
+  <testcase name="G1-S17 | [BOOT-FAIL] mappedBy trỏ sai tên field: Hibernate không khởi động" classname="com.example.hibernatelab.g1_owning_side.G1V4BidirectionalTest" time="0.021"/>
+  <system-out><![CDATA[[DB] g1_v4_bidi_mappedby.customer (1 dòng)
+  | id | name |
+  +----+------+
+  | 1  | An   |
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

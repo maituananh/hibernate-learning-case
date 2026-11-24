@@ -1,0 +1,1 @@
+{ "id": "g13-p1", "schema": "g13_p1_pc_stateless", "tables": ["customer", "purchase_order"] }
