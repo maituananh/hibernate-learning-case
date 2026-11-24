@@ -1,0 +1,1 @@
+{ "id": "g9-sd", "schema": "g9_s11_soft_delete", "tables": ["purchase_order", "order_item"] }

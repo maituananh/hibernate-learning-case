@@ -1,0 +1,1 @@
+{ "id": "g5-f4", "schema": "g5_f4_subselect", "tables": ["customer", "purchase_order"] }

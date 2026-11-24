@@ -1,0 +1,1 @@
+{ "id": "g10-q1", "schema": "g10_q1_baseline", "tables": ["customer", "purchase_order"] }

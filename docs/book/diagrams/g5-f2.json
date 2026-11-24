@@ -1,0 +1,1 @@
+{ "id": "g5-f2", "schema": "g5_f2_eager_collection", "tables": ["customer", "purchase_order", "payment"] }

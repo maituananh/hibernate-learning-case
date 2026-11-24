@@ -1,0 +1,1 @@
+{ "id": "g5-f1", "schema": "g5_f1_all_lazy", "tables": ["customer", "purchase_order", "order_item", "product", "payment"] }

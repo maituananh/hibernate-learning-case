@@ -1,0 +1,1 @@
+{ "id": "g12-f1", "schema": "g12_f1_formula_filter", "tables": ["customer", "purchase_order", "note", "coupon"] }

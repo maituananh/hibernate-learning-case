@@ -1,0 +1,1 @@
+{ "id": "g5-f0", "schema": "g5_f0_defaults", "tables": ["customer", "purchase_order"] }
