@@ -1,0 +1,53 @@
+{
+  "chapters": [
+    { "id": "bia", "file": "000-bia-va-muc-luc.md", "kind": "front", "status": "done" },
+    { "id": "loi-noi-dau", "file": "005-loi-noi-dau.md", "kind": "front", "title": "Lời nói đầu: Cách đọc cuốn sách này", "status": "todo" },
+
+    { "id": "phan-1", "file": "010-phan-1.md", "kind": "part", "title": "Phần I. Nền tảng", "status": "done" },
+    { "id": "01", "file": "011-chuong-01-mo-hinh-mau.md", "kind": "chapter", "number": 1, "title": "Mô hình mẫu và kiến thức tối thiểu", "scenarios": [], "extra": [], "status": "todo" },
+    { "id": "02", "file": "012-chuong-02-vong-doi-entity.md", "kind": "chapter", "number": 2, "title": "Vòng đời entity và persistence context", "scenarios": ["G0-S01..S11", "G0-S13"], "extra": [], "status": "todo" },
+    { "id": "03", "file": "013-chuong-03-anh-xa-cot.md", "kind": "chapter", "number": 3, "title": "Ánh xạ cột và kiểu giá trị: Embeddable, Enum, AttributeConverter, NaturalId", "scenarios": ["G12-S01..S03", "G12-S10", "G12-S11"], "extra": [], "status": "todo" },
+
+    { "id": "phan-2", "file": "020-phan-2.md", "kind": "part", "title": "Phần II. Quan hệ giữa các bảng", "status": "done" },
+    { "id": "04", "file": "021-chuong-04-khoa-ngoai.md", "kind": "chapter", "number": 4, "title": "Ai giữ khóa ngoại: ManyToOne, OneToMany và mappedBy", "scenarios": ["G1-S01..S18"], "extra": [], "status": "done" },
+    { "id": "05", "file": "022-chuong-05-cascade.md", "kind": "chapter", "number": 5, "title": "Cascade: thao tác nào lan từ cha sang con", "scenarios": ["G2-S01..S11", "G2-S13"], "extra": [], "status": "todo" },
+    { "id": "06", "file": "023-chuong-06-orphan-removal.md", "kind": "chapter", "number": 6, "title": "orphanRemoval: khi con bị tách khỏi cha", "scenarios": ["G3-S01..S11", "G9-S06"], "extra": [], "status": "todo" },
+    { "id": "07", "file": "024-chuong-07-one-to-one.md", "kind": "chapter", "number": 7, "title": "Quan hệ một-một: OneToOne và MapsId", "scenarios": ["G6-S01..S11", "G6-S13"], "extra": ["G6-S12"], "status": "todo" },
+    { "id": "08", "file": "025-chuong-08-many-to-many.md", "kind": "chapter", "number": 8, "title": "Quan hệ nhiều-nhiều: ManyToMany và entity trung gian", "scenarios": ["G7-S01..S12"], "extra": ["G7-S14"], "status": "todo" },
+    { "id": "09", "file": "026-chuong-09-khoa-ghep.md", "kind": "chapter", "number": 9, "title": "Khóa chính ghép và khóa ngoại nhiều cột", "scenarios": ["G8-S01..S07"], "extra": [], "status": "todo" },
+    { "id": "10", "file": "027-chuong-10-mo-hinh-dac-biet.md", "kind": "chapter", "number": 10, "title": "Các mô hình đặc biệt: cây tự tham chiếu, ElementCollection, kế thừa", "scenarios": ["G9-S01", "G12-S04..S09"], "extra": [], "status": "todo" },
+
+    { "id": "phan-3", "file": "030-phan-3.md", "kind": "part", "title": "Phần III. Đọc dữ liệu", "status": "done" },
+    { "id": "11", "file": "031-chuong-11-fetch-n-plus-1.md", "kind": "chapter", "number": 11, "title": "FetchType, proxy và vấn đề N+1", "scenarios": ["G5-S01..S14", "G5-S16", "G7-S13"], "extra": [], "status": "todo" },
+    { "id": "12", "file": "032-chuong-12-truy-van.md", "kind": "chapter", "number": 12, "title": "Viết truy vấn: JPQL, native SQL và phân trang", "scenarios": ["G10-S01..S05", "G10-S08..S10", "G5-S15"], "extra": [], "status": "todo" },
+    { "id": "13", "file": "033-chuong-13-loc-trong-mapping.md", "kind": "chapter", "number": 13, "title": "Lọc dữ liệu ngay trong mapping: Formula, SQLRestriction, Filter, SoftDelete", "scenarios": ["G12-S12..S14", "G9-S11", "G10-S07"], "extra": [], "status": "todo" },
+
+    { "id": "phan-4", "file": "040-phan-4.md", "kind": "part", "title": "Phần IV. Ghi dữ liệu và đồng thời", "status": "done" },
+    { "id": "14", "file": "041-chuong-14-sua-con-qua-cha.md", "kind": "chapter", "number": 14, "title": "Sửa bảng con thông qua bảng cha", "scenarios": ["G4-S01..S10", "G4-S12", "G9-S02", "G9-S09"], "extra": [], "status": "todo" },
+    { "id": "15", "file": "042-chuong-15-cap-nhat-hang-loat.md", "kind": "chapter", "number": 15, "title": "Cập nhật và xóa hàng loạt", "scenarios": ["G2-S12", "G4-S13", "G9-S05", "G10-S06"], "extra": [], "status": "todo" },
+    { "id": "16", "file": "043-chuong-16-transaction.md", "kind": "chapter", "number": 16, "title": "Ranh giới transaction trong Spring", "scenarios": ["G0-S12", "G0-S14", "G9-S07", "G11-S01..S04", "G11-S12"], "extra": [], "status": "todo" },
+    { "id": "17", "file": "044-chuong-17-khoa-du-lieu.md", "kind": "chapter", "number": 17, "title": "Ghi đồng thời và khóa dữ liệu", "scenarios": ["G11-S05..S11", "G4-S11", "G9-S08"], "extra": [], "status": "todo" },
+
+    { "id": "phan-5", "file": "050-phan-5.md", "kind": "part", "title": "Phần V. Hiệu năng", "status": "done" },
+    { "id": "18", "file": "051-chuong-18-ghi-so-luong-lon.md", "kind": "chapter", "number": 18, "title": "Ghi số lượng lớn: batch, sequence và StatelessSession", "scenarios": ["G13-S01..S05"], "extra": [], "status": "todo" },
+    { "id": "19", "file": "052-chuong-19-cache.md", "kind": "chapter", "number": 19, "title": "Second-level cache và query cache", "scenarios": ["G13-S06..S10"], "extra": [], "status": "todo" },
+    { "id": "20", "file": "053-chuong-20-bytecode-enhancement.md", "kind": "chapter", "number": 20, "title": "Bytecode enhancement", "scenarios": ["G13-S11..S13"], "extra": [], "status": "todo" },
+
+    { "id": "phan-6", "file": "060-phan-6.md", "kind": "part", "title": "Phần VI. Thực chiến", "status": "done" },
+    { "id": "21", "file": "061-chuong-21-bay-entity.md", "kind": "chapter", "number": 21, "title": "Những bẫy khi viết lớp entity", "scenarios": ["G9-S03", "G9-S04"], "extra": [], "status": "todo" },
+    { "id": "22", "file": "062-chuong-22-su-co.md", "kind": "chapter", "number": 22, "title": "Bốn sự cố production và cách xử lý", "scenarios": ["G14-I1-S01..S04", "G14-I2-S01..S04", "G14-I3-S01..S04", "G14-I4-S01..S04"], "extra": [], "status": "todo" },
+    { "id": "23", "file": "063-chuong-23-rao-chan.md", "kind": "chapter", "number": 23, "title": "Rào chắn cho cả team", "scenarios": ["G14-R1-S01..S03", "G14-R2-S01..S03"], "extra": [], "status": "todo" },
+
+    { "id": "phan-7", "file": "070-phan-7.md", "kind": "part", "title": "Phần VII. Mở rộng tầm nhìn", "status": "done" },
+    { "id": "24", "file": "071-chuong-24-ngoai-lab.md", "kind": "chapter", "number": 24, "title": "Tình huống thực tế chưa có trong lab", "scenarios": [], "extra": ["G14-I5"], "status": "todo" },
+    { "id": "25", "file": "072-chuong-25-so-sanh-cong-cu.md", "kind": "chapter", "number": 25, "title": "Hibernate so với các công cụ khác và lộ trình học tiếp", "scenarios": [], "extra": [], "status": "todo" },
+
+    { "id": "phu-luc", "file": "090-phu-luc.md", "kind": "part", "title": "Phụ lục", "status": "done" },
+    { "id": "pl-a", "file": "091-phu-luc-a-annotation.md", "kind": "appendix", "letter": "A", "title": "Tra cứu annotation", "allowCodes": true, "status": "todo" },
+    { "id": "pl-b", "file": "092-phu-luc-b-khac-du-doan.md", "kind": "appendix", "letter": "B", "title": "Những kết quả khác dự đoán", "allowCodes": true, "status": "todo" },
+    { "id": "pl-c", "file": "093-phu-luc-c-tra-cuu-tinh-huong.md", "kind": "appendix", "letter": "C", "title": "Bảng tra tình huống", "allowCodes": true, "status": "todo" },
+    { "id": "pl-d", "file": "094-phu-luc-d-pull-request.md", "kind": "appendix", "letter": "D", "title": "Danh sách Pull Request", "allowCodes": true, "status": "todo" },
+    { "id": "pl-e", "file": "095-phu-luc-e-chay-lab.md", "kind": "appendix", "letter": "E", "title": "Cách chạy lab", "allowCodes": true, "status": "todo" },
+    { "id": "pl-f", "file": "096-phu-luc-f-thuat-ngu.md", "kind": "appendix", "letter": "F", "title": "Bảng thuật ngữ", "allowCodes": true, "status": "todo" }
+  ]
+}

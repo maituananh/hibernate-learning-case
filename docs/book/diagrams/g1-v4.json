@@ -1,0 +1,1 @@
+{ "id": "g1-v4", "schema": "g1_v4_bidi_mappedby", "tables": ["customer", "purchase_order"] }

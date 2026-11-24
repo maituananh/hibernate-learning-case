@@ -1,0 +1,1 @@
+{ "id": "g1-v6", "schema": "g1_v6_bidi_owner_parent", "tables": ["customer", "purchase_order"] }

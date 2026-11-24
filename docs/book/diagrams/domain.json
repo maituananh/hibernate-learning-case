@@ -1,0 +1,6 @@
+{
+  "id": "domain",
+  "schema": "g5_f1_all_lazy",
+  "tables": ["customer", "purchase_order", "order_item", "product", "payment"],
+  "rows": [["payment", "customer", "purchase_order"], ["product", "order_item"]]
+}

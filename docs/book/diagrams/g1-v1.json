@@ -1,0 +1,1 @@
+{ "id": "g1-v1", "schema": "g1_v1_m2o_uni", "tables": ["customer", "purchase_order", "address"] }

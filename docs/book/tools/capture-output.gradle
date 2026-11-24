@@ -1,0 +1,12 @@
+// Init script chỉ dùng khi build sách: node docs/book/tools/capture-evidence.mjs --run
+//
+// Mặc định Gradle gộp stdout của cả class test vào MỘT khối <system-out> trong file XML,
+// nên không biết câu SQL nào thuộc test method nào. outputPerTestCase = true ghi stdout vào
+// từng <testcase>, nhờ đó mỗi mã tình huống có bằng chứng (SQL, dữ liệu DB) riêng.
+//
+// Dùng init script (truyền bằng --init-script) để KHÔNG phải sửa build.gradle của lab.
+allprojects {
+    tasks.withType(Test).configureEach {
+        reports.junitXml.outputPerTestCase = true
+    }
+}
