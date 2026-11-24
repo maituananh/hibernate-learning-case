@@ -847,7 +847,7 @@ Chứng cứ: Hibernate `Statistics` + `SqlCaptor` (E4).
 
 | Mã | Câu hỏi | Giả thuyết |
 |---|---|---|
-| G13-S01 ⭐🔬 | Batch insert 100 entity, `SEQUENCE` + `setJdbcBatchSize(20)` | 5 batch (qua Statistics) |
+| G13-S01 ⭐🔬 | Batch insert 100 entity, `SEQUENCE` + `setJdbcBatchSize(20)` | 5 batch *(thực tế: đếm bằng log `BatchLogCapture`, không phải Statistics; S01a/b)* |
 | G13-S02 ⭐🔬 | Như S01 nhưng `IDENTITY` (thay G9-S10) | Batching bị tắt, 100 lần INSERT |
 | G13-S03 ⭐🔬 | `allocationSize = 1` so với `50`: số lần gọi `nextval` khi insert 100 entity | 100 so với khoảng 2 |
 | G13-S04 ⭐ | Vòng lặp 2 000 dòng: PC lớn dần thế nào; `flush()` + `clear()` theo lô | Đếm entity trong PC (`SessionStatistics`) |
@@ -855,7 +855,7 @@ Chứng cứ: Hibernate `Statistics` + `SqlCaptor` (E4).
 | G13-S06 ⭐ | Entity cache: `find` ở transaction thứ hai | 0 SELECT |
 | G13-S07 ⭐🔬 | Bulk JPQL / native `UPDATE` có làm hỏng cache không? | Bulk JPQL xoá cả region; native xoá toàn bộ nếu không khai query space |
 | G13-S08 ⭐🔬 | Collection cache chỉ lưu id: phần tử không được cache thì sao? | N+1 SELECT phần tử |
-| G13-S09 ⭐🔬 | Query cache khi entity không được cache | Trả id rồi SELECT từng entity |
+| G13-S09 ⭐🔬 | Query cache khi entity không được cache | Trả id rồi SELECT từng entity *(thực tế khác: 0 SELECT, entity đủ dữ liệu; làm thành S09a/b/c, xem RESULTS)* |
 | G13-S10 ➕🔬 | `READ_ONLY` cache mà sửa entity | Exception |
 | G13-S11 ⭐🔬 | (G13b) Bytecode enhancement: thử lại G6-S03 | LAZY phía inverse `@OneToOne` chạy được |
 | G13-S12 ⭐🔬 | (G13b) `@Basic(fetch = LAZY)` cho cột lớn | Không enhancement: bị bỏ qua; có: hoãn |

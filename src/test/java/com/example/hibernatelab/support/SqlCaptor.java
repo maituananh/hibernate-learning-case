@@ -60,6 +60,17 @@ public class SqlCaptor implements StatementInspector {
 		return result;
 	}
 
+	/** Số lần gọi {@code nextval} của sequence từ lần {@link #reset()} cuối (G13-S03 đếm chính số này). */
+	public int sequenceCallCount() {
+		int count = 0;
+		for (Entry entry : entries) {
+			if (!entry.isMarker() && isSequenceCall(entry.text())) {
+				count++;
+			}
+		}
+		return count;
+	}
+
 	/** Mọi dòng đã ghi (kể cả nextval và dấu mốc), dùng để in ra cho người học xem. */
 	List<String> printableLines() {
 		List<String> lines = new ArrayList<>();

@@ -213,7 +213,7 @@ Danh sách tình huống nằm ở [02-SCENARIOS.md](02-SCENARIOS.md) (G10–G14
 | 13 | G10: một bộ model baseline `Q1` (Customer, PurchaseOrder, OrderItem, Product, mọi quan hệ LAZY) | `G10JoinVsJoinFetchTest` (S01–S03), `G10NativeQueryTest` (S04–S07), `G10PagingTest` (S08–S10) |
 | 14 | G11: `Product.stock`, `Job`, service layer, helper `ConcurrentTx` trong `support/` | theo từng chủ đề: `readOnly`, propagation, lost update, pessimistic lock, deadlock |
 | 15 | G12: embeddable, element collection, 3 chiến lược `@Inheritance`, `@NaturalId`, converter, `@Formula`/`@SQLRestriction`/`@Filter` | mỗi chủ đề một class |
-| 16 | G13a: dependency `hibernate-jcache` + provider, `evictAll()` trong `AbstractScenarioTest` | batch, persistence context, `StatelessSession`, second-level cache |
+| 16 | G13a: dependency `hibernate-jcache` + Caffeine JCache, `evictAllRegions()` trong `AbstractScenarioTest`; entity B1–B3 (batch/id), P1 (PC, StatelessSession), K1–K4 (cache) | `G13BatchTest` (S01–S03), `G13PersistenceContextTest` (S04–S05), `G13SecondLevelCacheTest` (S06–S10) |
 | 17 | G13b: `testFixtures` + subproject `lab-enhanced/` | enhancement (G6-S03 thử lại, `@Basic(fetch = LAZY)`, dirty tracking) |
 | 18 | G14: `i<N>_buggy` / `i<N>_fixed`, test ngân sách SQL, test lint Metamodel | mỗi sự cố 4 test: tái hiện → chẩn đoán → sửa → rào chắn |
 | 19 | — | tổng kết: RESULTS, CHEATSHEET, coverage, README gốc, thời gian chạy |

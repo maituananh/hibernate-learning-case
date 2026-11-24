@@ -16,9 +16,28 @@ spring:
         format_sql: true
         # Cố ý KHÔNG đặt jdbc.batch_size và default_batch_fetch_size:
         # bật toàn cục sẽ làm thay đổi số câu SQL mà các test cần đếm chính xác.
+        # (G13 đặt batch size THEO TỪNG SESSION bằng session.setJdbcBatchSize(n), xem E4.)
+        cache:
+          # Second-level cache (G13, E3). Bật hạ tầng cache nhưng vẫn an toàn cho test cũ nhờ
+          # `shared-cache-mode: ENABLE_SELECTIVE` bên dưới: chỉ entity có @Cacheable/@Cache mới vào cache,
+          # query chỉ vào query cache khi tự gọi setCacheable(true).
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: jcache
+        javax:
+          cache:
+            # Tự tạo cache cho mỗi region lần đầu gặp (không cần file cấu hình cache).
+            missing_cache_strategy: create
+            # CacheManager được tạo riêng cho từng Spring context trong ScenarioTestConfiguration
+            # (thuộc tính hibernate.javax.cache.cache_manager), xem lý do ở đó.
       # Xuất DDL ra file để đọc lại: build/ddl/create.sql
       jakarta:
         persistence:
+          # BẪY cache: mặc định (UNSPECIFIED) có thể cache MỌI entity. ENABLE_SELECTIVE = chỉ cache entity
+          # được đánh dấu @Cacheable, nên 300+ test cũ không bị cache chen vào.
+          sharedCache:
+            mode: ENABLE_SELECTIVE
           schema-generation:
             # BẪY: hễ khai báo `scripts.action` (bên dưới) thì Hibernate chỉ XUẤT FILE mà KHÔNG còn tạo bảng
             # trong DB (bỏ qua spring.jpa.hibernate.ddl-auto). Nên phải nói tường minh `database.action`.
