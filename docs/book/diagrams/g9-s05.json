@@ -1,0 +1,1 @@
+{ "id": "g9-s05", "schema": "g9_s05_bulk_modifying", "tables": ["product", "purchase_order", "order_item"] }

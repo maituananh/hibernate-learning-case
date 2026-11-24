@@ -1,0 +1,1 @@
+{ "id": "g4-u0", "schema": "g4_u0_baseline", "tables": ["customer", "purchase_order", "order_item", "product"] }
