@@ -918,7 +918,8 @@ Test rào chắn phải chứng minh **cả hai chiều**: bắt được trên 
 | `@Inheritance` (3 chiến lược) *(mở rộng)* | G12-S06..S09 |
 | `@Formula`, `@SQLRestriction`, `@Filter` *(mở rộng)* | G12-S12..S14 |
 | Batch, `StatelessSession`, `@Cacheable`/`@Cache`, query cache *(mở rộng)* | G13-S01..S10 |
-| Bytecode enhancement *(mở rộng)* | G13-S11..S13 |
+| Bytecode enhancement *(mở rộng)* | G13-S11..S13 (subproject `lab-enhanced/`) |
+| Sự cố tổng hợp, ngân sách SQL, lint Metamodel, LEAD-PLAYBOOK, ADR *(mở rộng)* | G14-I1..I4, G14-R1, R2, D1, D2 |
 
 ### Kết quả đối chiếu coverage (Phase 12)
 
@@ -928,5 +929,13 @@ Ba mã ➕ không có test riêng, không làm hụt annotation nào:
 - **G6-S12** (`optional = false` trên `@OneToOne`): ngoài phạm vi Phase 8; `optional = false` trên `@ManyToOne` đã được test ở G1-S04c/d.
 - **G7-S14** (khi nào bỏ `@ManyToMany`): chỉ là ghi chú, nằm trong README nhóm G7.
 - **G9-S10** (batch insert SEQUENCE vs IDENTITY): cần `hibernate.jdbc.batch_size` toàn cục (trái quy ước) và thư viện đếm batch; để tuỳ chọn.
+
+### Kết quả đối chiếu coverage giai đoạn mở rộng (Phase 19)
+
+Đối chiếu bằng cách lấy mọi mã `G10`–`G14` trong file này so với `@DisplayName("G<N>-…")` của test thật (project gốc và `lab-enhanced/`):
+**55 trên 59 mã có test xanh**, mọi annotation trong bảng trên đều có ít nhất một test. Bốn mã còn lại:
+
+- **G14-D1, G14-D2:** là tài liệu (`LEAD-PLAYBOOK.md`, `adr/`), không phải test; đã làm.
+- **G14-I5, G14-R3 (➕):** người học chốt ở Phase 18 chỉ làm ⭐, nên không làm.
 
 Tra cứu theo annotation: [CHEATSHEET.md](CHEATSHEET.md).
