@@ -3,7 +3,7 @@
 **Câu hỏi trung tâm:** làm sao biết, bằng thứ **đếm được** (không bằng đồng hồ), một thao tác tốn kém; và cache giúp hay hại ở đâu?
 
 Phase 16 làm phần **G13a** ở project gốc (batch, persistence context, `StatelessSession`, second-level cache).
-Phần **G13b** (bytecode enhancement, S11–S13) nằm ở subproject `lab-enhanced/`, làm ở Phase 17.
+Phase 17 làm phần **G13b** (bytecode enhancement, S11–S13) ở subproject [`lab-enhanced/`](#g13b--bytecode-enhancement-subproject-lab-enhanced) (xem cuối file).
 
 Entity nằm ở [src/main/.../g13_performance](../../../../../../main/java/com/example/hibernatelab/g13_performance/).
 Mỗi biến thể là một package = một schema. Dữ liệu seed bằng JDBC (không qua Hibernate).
@@ -80,3 +80,67 @@ Batch size đặt **theo từng session** (`session.setJdbcBatchSize(20)`), khô
 - **Xử lý rất nhiều dòng:** `flush` + `clear` theo lô là đủ cho đa số trường hợp; `StatelessSession` khi không cần dirty checking/cascade/lazy (S04, S05).
 - **Cache cái gì:** dữ liệu tham chiếu, ít đổi, **chỉ ghi qua Hibernate** (S06). Bảng bị script/hệ thống khác sửa thì đừng cache, hoặc chấp nhận dữ liệu cũ (S06b, S09c). Bulk/native update phải đi kèm evict có chủ đích (S07). Muốn hết N+1 qua cache collection thì phải cache cả phần tử (S08).
 - **`hibernate.order_inserts` / `order_updates`:** không làm thành test vì chỉ đặt được toàn cục (sẽ đổi thứ tự SQL của G3-S10). Chỉ ghi chú: bật khi dùng batch với entity có quan hệ để các INSERT cùng bảng được gom liền nhau.
+
+---
+
+# G13b — Bytecode enhancement (subproject `lab-enhanced/`)
+
+**Câu hỏi trung tâm:** những thứ mà Hibernate "không làm được" ở G0–G12 (LAZY phía inverse của `@OneToOne`, `@Basic(fetch = LAZY)`) có làm được nếu sửa bytecode của entity không?
+
+Test: [lab-enhanced/.../G13BytecodeEnhancementTest](../../../../../../../../lab-enhanced/src/test/java/com/example/hibernatelab/g13_enhanced/G13BytecodeEnhancementTest.java).
+Entity (đã enhance): [lab-enhanced/src/main/.../g13_enhanced](../../../../../../../../lab-enhanced/src/main/java/com/example/hibernatelab/g13_enhanced/).
+
+## Vì sao phải có subproject riêng
+
+Plugin Gradle `org.hibernate.orm` sửa file `.class` của **mọi** entity trong source set `main` của project nó được khai.
+Bật ở project gốc sẽ đổi kết quả test cũ (ví dụ G6-S03a). Nên:
+
+| Thứ | Ở đâu | Ghi chú |
+|---|---|---|
+| Plugin `org.hibernate.orm` | chỉ `lab-enhanced/build.gradle` | cùng version Hibernate với Spring Boot (7.4.15.Final) |
+| Entity **đã enhance** (E1, E2, E3) | `lab-enhanced/src/main` | plugin chỉ áp cho source set `main` |
+| Entity **đối chứng** không enhance (C2, C3) | `lab-enhanced/src/test` | so "có" và "không" enhancement ngay trong một class test |
+| Hạ tầng test (`SqlCaptor`, `DbReader`, Postgres container, …) | `src/testFixtures` của project gốc | `java-test-fixtures`; package `support` giữ nguyên nên test cũ không đổi import |
+| Guard "project gốc không bị enhance" | `G13EnhancementGuardTest` (project gốc) | đỏ nếu ai lỡ bật plugin ở gốc |
+
+`./gradlew test` chạy test của cả hai project; `./gradlew :lab-enhanced:test` chỉ chạy subproject.
+Có enhancement hay chưa kiểm chứng bằng chính file `.class`: entity phải `implements PersistentAttributeInterceptable` (S11c).
+
+## Biến thể
+
+| Mã | Schema | Nội dung | Khác baseline | Test |
+|---|---|---|---|---|
+| E1 | `g13_e1_inverse_one_to_one` | `Customer` ⟷ `LoyaltyCard`, inverse `@OneToOne(mappedBy, LAZY)` | baseline = G6-V3, **thêm enhancement** | S11a, S11b, S11c |
+| E2 | `g13_e2_lazy_basic` | `Document.body` `@Basic(fetch = LAZY)` | **thêm enhancement** | S12a |
+| C2 | `g13_c2_plain_basic` | như E2 | **không** enhancement (đối chứng) | S12b |
+| E3 | `g13_e3_dirty_tracking` | `Product` (name, price, description) | **thêm enhancement** (dirty tracking) | S13a, S13c |
+| C3 | `g13_c3_plain_dirty` | như E3 | **không** enhancement (đối chứng) | S13b |
+
+## Bảng kết quả
+
+| Tình huống | Kết quả thực tế | Ghi chú |
+|---|---|---|
+| S11a E1 `find(customer)` | 1 SELECT (chỉ customer); field `loyaltyCard` chưa tải; `getLoyaltyCard()` mới SELECT thêm | **LAZY phía inverse chạy được** (G6-S03a thì không) |
+| S11b customer không có thẻ | `find` 1 SELECT; `getLoyaltyCard()` SELECT thêm rồi trả `null` | biết "có thẻ hay không" vẫn tốn một SELECT |
+| S11c class có bị enhance không | E1 implements `PersistentAttributeInterceptable`; C2, C3 thì không; `getClass()` vẫn là chính entity | không sinh class proxy phụ |
+| S11d (guard, project gốc) | `V3Customer` không implements `PersistentAttributeInterceptable`/`SelfDirtinessTracker` | |
+| S12a E2 có enhancement | `find` chỉ SELECT `id, title`; `getBody()` SELECT riêng cột `body` | |
+| S12b C2 không enhancement | `body` nằm ngay trong SELECT đầu | `@Basic(fetch = LAZY)` bị bỏ qua, không báo gì |
+| S13a E3 sửa `price` | UPDATE ghi cả 3 cột | dirty tracking **không** thu hẹp câu UPDATE |
+| S13b C3 sửa `price` | UPDATE giống hệt S13a | từ SQL không phân biệt được hai cách |
+| S13c E3 chỉ đọc | không có UPDATE | |
+
+## Ba điều phải nhớ
+
+1. **LAZY là chỉ dẫn, không phải mệnh lệnh.** `@OneToOne(mappedBy …, LAZY)` phía inverse và `@Basic(fetch = LAZY)` đều bị Hibernate lẳng lặng bỏ qua nếu không có bytecode enhancement. Thấy annotation LAZY trong code không có nghĩa là nó đang lazy (S11a, S12a so với S12b).
+2. **Enhancement không phải viên đạn bạc.** Nó đổi cách entity được tải và theo dõi thay đổi, nhưng không đổi câu UPDATE (S13): muốn UPDATE chỉ chứa cột đổi vẫn cần `@DynamicUpdate`. Với `@OneToOne` inverse, "không có thẻ" vẫn tốn một SELECT để biết (S11b).
+3. **Cái giá phải trả:** thêm bước build (plugin), bytecode chạy khác source bạn đọc, và mọi entity trong source set bị áp cùng cấu hình. Vì vậy lab tách subproject; trong dự án thật hãy bật khi đã đo được vấn đề (cột lớn, `@OneToOne` inverse hay gây N+1), không bật mặc định.
+
+## Quyết định cho lead
+
+| Tình huống | Nên | Vì sao |
+|---|---|---|
+| `@OneToOne` inverse hay gây N+1 (G6-S03b) | Ưu tiên đổi thiết kế: lật FK, hoặc `@MapsId` (G6-S08); enhancement chỉ khi không đổi được schema | S11a: enhancement làm được, nhưng thêm bước build và vẫn tốn SELECT khi chạm vào (S11b) |
+| Bảng có cột rất lớn (văn bản dài, JSON, blob) mà hầu hết truy vấn không cần | Tách cột ra entity/bảng riêng, hoặc projection (G10); dùng `@Basic(fetch = LAZY)` chỉ khi đã bật enhancement | S12b: không enhancement thì annotation vô tác dụng |
+| Muốn UPDATE chỉ ghi cột đổi | `@DynamicUpdate` (G4-U4), không trông chờ dirty tracking | S13a |
+| Muốn giảm chi phí dirty checking khi persistence context lớn | `flush` + `clear` theo lô (S04) hoặc `StatelessSession` (S05) trước khi nghĩ tới enhancement | rẻ hơn và không đổi build |

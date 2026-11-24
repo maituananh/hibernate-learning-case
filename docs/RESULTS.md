@@ -120,6 +120,13 @@ theo cột **Thực tế**, không theo trí nhớ. Dòng nào cột Thực tế
 | G13-S09b | Query cache khi entity được cache | 0 SELECT | Đúng: 0 SELECT | Khớp | Hibernate 7.4.15.Final |
 | G13-S09c | Sửa DB ngoài Hibernate sau khi query đã vào query cache | (không có giả thuyết trước) | Query cache trả dữ liệu CŨ, 0 SELECT | Quan sát | Hibernate 7.4.15.Final |
 | G13-S10 | `READ_ONLY` cache mà sửa entity | Exception | Đúng: UPDATE được gửi, lúc commit ném `UnsupportedOperationException: Can't update read-only object` (bọc trong `TransactionSystemException`), rollback, DB giữ giá cũ | Khớp | Hibernate 7.4.15.Final |
+| G13-S11a | Bytecode enhancement: LAZY phía inverse của `@OneToOne` (thử lại G6-S03a) | LAZY chạy được | Đúng: `find(customer)` chỉ 1 SELECT (không đụng `loyalty_card`), `Hibernate.isPropertyInitialized` = false; `getLoyaltyCard()` mới SELECT thứ hai (join sang `loyalty_card`) | Khớp | Hibernate 7.4.15.Final |
+| G13-S11b | Như S11a nhưng customer không có thẻ | (không có giả thuyết trước) | `find` 1 SELECT; `getLoyaltyCard()` SELECT thêm rồi trả `null` | Quan sát | Hibernate 7.4.15.Final |
+| G13-S12a | `@Basic(fetch = LAZY)` có enhancement | Hoãn cột | Đúng: `find` chỉ SELECT `id, title`; `getBody()` SELECT riêng cột `body` | Khớp | Hibernate 7.4.15.Final |
+| G13-S12b | `@Basic(fetch = LAZY)` không enhancement (entity đối chứng ở `src/test`) | Bị bỏ qua | Đúng: `body` nằm ngay trong SELECT đầu, không báo lỗi hay cảnh báo | Khớp | Hibernate 7.4.15.Final |
+| G13-S13a | Dirty tracking: sửa một cột, UPDATE chứa cột nào | Chưa rõ | **Cả 3 cột** (`set description=?,name=?,price=?`): dirty tracking chỉ đổi cách phát hiện thay đổi, không thu hẹp câu UPDATE (cần `@DynamicUpdate`) | Quan sát | Hibernate 7.4.15.Final |
+| G13-S13b | Như S13a nhưng không enhancement | (đối chứng) | Câu UPDATE giống hệt S13a | Quan sát | Hibernate 7.4.15.Final |
+| G13-S13c | Entity enhance chỉ đọc, không sửa | (không có giả thuyết trước) | Không có UPDATE | Quan sát | Hibernate 7.4.15.Final |
 
 ## Kiểm tra cuối (Phase 12)
 

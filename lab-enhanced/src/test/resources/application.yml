@@ -1,0 +1,28 @@
+# Cấu hình test của subproject lab-enhanced (giống project gốc, bỏ phần cache vì G13b không dùng cache).
+# Datasource KHÔNG khai báo: Testcontainers cung cấp qua @ServiceConnection (PostgresTestcontainer ở testFixtures).
+spring:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        # BẮT BUỘC: mỗi biến thể nằm trong một schema Postgres riêng, không bật thì Hibernate không tự `create schema`.
+        hbm2ddl:
+          create_namespaces: true
+        format_sql: true
+      jakarta:
+        persistence:
+          schema-generation:
+            # `scripts.action` mà không có `database.action` thì Hibernate chỉ xuất file, KHÔNG tạo bảng (xem application.yml gốc).
+            database:
+              action: create-drop
+            scripts:
+              action: create
+              create-target: build/ddl/create.sql
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.jdbc.core.JdbcTemplate: DEBUG
