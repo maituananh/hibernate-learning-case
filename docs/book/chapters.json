@@ -11,7 +11,7 @@
       "file": "005-loi-noi-dau.md",
       "kind": "front",
       "title": "Lời nói đầu: Cách đọc cuốn sách này",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "phan-1",
@@ -406,7 +406,7 @@
       "letter": "A",
       "title": "Tra cứu annotation",
       "allowCodes": true,
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "pl-b",
@@ -415,7 +415,7 @@
       "letter": "B",
       "title": "Những kết quả khác dự đoán",
       "allowCodes": true,
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "pl-c",
@@ -424,7 +424,7 @@
       "letter": "C",
       "title": "Bảng tra tình huống",
       "allowCodes": true,
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "pl-d",
@@ -433,7 +433,7 @@
       "letter": "D",
       "title": "Danh sách Pull Request",
       "allowCodes": true,
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "pl-e",
@@ -442,7 +442,7 @@
       "letter": "E",
       "title": "Cách chạy lab",
       "allowCodes": true,
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "pl-f",
@@ -451,7 +451,7 @@
       "letter": "F",
       "title": "Bảng thuật ngữ",
       "allowCodes": true,
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "pl-g",
@@ -460,7 +460,7 @@
       "letter": "G",
       "title": "Đối chiếu JPA và Hibernate",
       "allowCodes": true,
-      "status": "todo"
+      "status": "done"
     }
   ]
 }

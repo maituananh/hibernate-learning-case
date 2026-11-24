@@ -8,6 +8,7 @@ Trong chương này:
 - Nhắc nhanh entity và các annotation cơ bản (mục 1.2).
 - Khóa chính, khóa ngoại và cách Hibernate sinh id (mục 1.3).
 - Cách lab chứng minh một tình huống, và cách đọc khung Tra cứu (mục 1.4).
+- JPA và Hibernate khác nhau chỗ nào, và sách viết ví dụ theo quy ước nào (mục 1.5).
 
 ### 1.1 Bộ bảng thương mại điện tử dùng xuyên suốt
 
@@ -66,3 +67,25 @@ Ba quy ước trong code ví dụ:
 - Dữ liệu trong bảng ở sách **không in id cụ thể** khi id không quan trọng, vì id sinh từ sequence có thể khác giữa các lần chạy.
 
 **Cách đọc một tình huống.** Các tình huống cốt lõi đều theo cùng một khuôn: Bối cảnh, Khi nào xảy ra, Khi nào không xảy ra, Ví dụ, Kết quả, Vì sao, rồi Ghi nhớ. Cuối mỗi tình huống có khung **Tra cứu trong repository**, cho biết thư mục entity, file test, tên method, và link tới Pull Request. Nếu muốn đọc kỹ hoặc chạy lại, bạn mở đúng file đó trong repository. Cách chạy lab nằm ở Phụ lục E.
+
+### 1.5 JPA và Hibernate: cùng một việc, hai cách viết
+
+**JPA** (Jakarta Persistence) là một đặc tả: nó định nghĩa các annotation, giao diện và ngôn ngữ truy vấn chung. **Hibernate** là một bản cài đặt (provider) của đặc tả đó, đồng thời bổ sung nhiều tính năng riêng. Spring Data JPA là lớp tiện ích của Spring đặt lên trên cả hai. Vì Hibernate cài đặt JPA, hầu hết thứ bạn học trong sách vừa đúng với Hibernate vừa đúng với JPA. Chỉ một phần nhỏ là riêng của Hibernate hoặc của Spring.
+
+Bảng dưới đây cho thấy những cặp tương đương bạn sẽ gặp nhiều nhất:
+
+| Việc cần làm | Cách viết chuẩn JPA | Cách viết riêng của Hibernate |
+|---|---|---|
+| Làm việc với persistence context | `EntityManager` (`persist`, `find`, `merge`, `remove`, `flush`) | `Session` (có thêm `setJdbcBatchSize`, `getStatistics`, và các API riêng) |
+| Lấy `Session` từ `EntityManager` | Không có | `entityManager.unwrap(Session.class)` |
+| Ngôn ngữ truy vấn theo entity | JPQL | HQL: bản mở rộng của JPQL, chạy được mọi câu JPQL |
+| Annotation | Package `jakarta.persistence` (`@Entity`, `@ManyToOne`, `@Version`...) | Package `org.hibernate.annotations` (`@BatchSize`, `@Formula`, `@SoftDelete`, `@OnDelete`...) |
+| Cấu hình | Thuộc tính `jakarta.persistence.*` | Thuộc tính `hibernate.*` |
+| Xử lý proxy và khởi tạo | `PersistenceUnitUtil.isLoaded(x)` | `Hibernate.isInitialized(x)`, `Hibernate.initialize(x)` |
+
+**Quy ước của sách.** Ví dụ dùng JPA chuẩn bất cứ khi nào có thể: `EntityManager`, JPQL, annotation `jakarta.persistence`. Khi một tình huống dùng API hoặc annotation riêng của Hibernate (ví dụ `@BatchSize`, `StatelessSession`) hoặc của Spring Data (ví dụ `Page`, `Specification`), phần giải thích của tình huống đó có thêm một đoạn **Trong JPA thuần.** nêu cách viết tương đương, hoặc nói rõ JPA không có cách tương đương. Phụ lục G gom mọi đoạn như vậy vào một bảng để bạn tra cứu một lần.
+
+Hai lưu ý để không bị bất ngờ:
+
+- JPA cho phép provider **bỏ qua** một số gợi ý. Ví dụ `fetch = LAZY` trên `@OneToOne` ở phía `mappedBy` chỉ là gợi ý, và Hibernate bỏ qua nếu không bật bytecode enhancement (Chương 20). Vì vậy sách không dựa vào tài liệu mà kiểm chứng bằng test.
+- Lab chạy trên Hibernate 7.4.15.Final. Một số hành vi (ví dụ `join` loại trùng kết quả, phân trang kèm `join fetch`) đã đổi so với Hibernate 5 và 6; Phụ lục B liệt kê những chỗ khác dự đoán.
