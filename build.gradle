@@ -1,5 +1,8 @@
 plugins {
 	id 'java'
+	// E2: chuyển hạ tầng test dùng chung (SqlCaptor, DbReader, ...) sang source set `testFixtures`
+	// để subproject `lab-enhanced` dùng lại. Package giữ nguyên nên test cũ không phải sửa import.
+	id 'java-test-fixtures'
 	id 'org.springframework.boot' version '4.2.0'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
@@ -27,6 +30,14 @@ dependencies {
 	testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
 	testImplementation 'org.testcontainers:testcontainers-postgresql'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Hạ tầng dùng chung (src/testFixtures). `Api` = lộ ra cho cả project gốc lẫn subproject dùng nó.
+	// Source set `test` của project gốc tự thấy testFixtures (plugin java-test-fixtures lo việc này).
+	testFixturesApi 'org.springframework.boot:spring-boot-starter-data-jpa'
+	testFixturesApi 'org.springframework.boot:spring-boot-starter-test'
+	testFixturesApi 'org.springframework.boot:spring-boot-testcontainers'
+	testFixturesApi 'org.testcontainers:testcontainers-junit-jupiter'
+	testFixturesApi 'org.testcontainers:testcontainers-postgresql'
 
 	// G13 (second-level cache, E3): Hibernate nói chuyện với cache qua chuẩn JCache (JSR-107).
 	// `hibernate-jcache` là cầu nối, Caffeine JCache là provider thật (chọn Caffeine vì không cần file XML cấu hình

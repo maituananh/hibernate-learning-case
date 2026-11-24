@@ -1,1 +1,6 @@
 rootProject.name = 'hibernate-lab'
+
+// E2: subproject riêng cho bytecode enhancement (G13b). Plugin `org.hibernate.orm` áp lên MỌI entity của source set `main`
+// trong project nó được khai, nên bật nó ở project gốc sẽ đổi kết quả các test cũ (ví dụ G6-S03). Tách subproject
+// thì project gốc không bao giờ bị enhance.
+include 'lab-enhanced'

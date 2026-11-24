@@ -28,6 +28,7 @@ Spring Boot (bản GA mới nhất, kiểm tra trên start.spring.io, không đo
 ./gradlew test                                   # chạy toàn bộ suite (Testcontainers Postgres)
 ./gradlew test --tests '*G1V4*'                  # một class
 ./gradlew test --tests '*G1V4*s03_*'             # một test method
+./gradlew :lab-enhanced:test                     # chỉ subproject bytecode enhancement (G13b); `./gradlew test` chạy cả hai project
 ./gradlew test --rerun                           # chạy lại khi code không đổi (Gradle coi test là up-to-date)
 docker compose up -d && ./gradlew test -Pinspect --rerun   # chạy vào Postgres của compose, giữ dữ liệu để xem
 ```
@@ -43,7 +44,8 @@ Bẫy Gradle (D15–D18), phải cấu hình trong `build.gradle`:
 
 - Entity + repository nằm ở `src/main/java/com/example/hibernatelab/g<N>_<nhóm>/v<M>_<biến thể>/`.
 - Test nằm ở `src/test/.../g<N>_<nhóm>/`, một class cho mỗi biến thể hoặc chủ đề (`G1V4...Test`), kèm `README.md` của nhóm (bảng biến thể, bảng A vs B, kết quả, DDL trích ra).
-- Hạ tầng test dùng chung ở `src/test/.../support/` (`SqlCaptor`/`SqlAssert` qua Hibernate `StatementInspector`, `inTx(...)` qua `TransactionTemplate`, `assertState(...)`, `db.print(...)`).
+- Hạ tầng test dùng chung ở `src/testFixtures/.../support/` (source set `testFixtures`, package `support` giữ nguyên; subproject `lab-enhanced/` dùng lại. `AbstractScenarioTest`, `ScenarioTestConfiguration`, `ConcurrentTx`, `BatchLogCapture` vẫn ở `src/test/.../support/` vì gắn với project gốc) (`SqlCaptor`/`SqlAssert` qua Hibernate `StatementInspector`, `inTx(...)` qua `TransactionTemplate`, `assertState(...)`, `db.print(...)`).
+- **Bytecode enhancement chỉ nằm ở subproject `lab-enhanced/`** (plugin `org.hibernate.orm` áp lên mọi entity của source set `main`). Không bao giờ khai plugin ở project gốc; `G13EnhancementGuardTest` sẽ đỏ nếu lỡ làm vậy. Entity đối chứng không enhance đặt ở `lab-enhanced/src/test`.
 - Entity `[BOOT-FAIL]` (cố ý sai) nằm ở `src/test/.../bootfail/` và **phải bị loại khỏi entity scan**.
 - Service layer chỉ có ở nơi tình huống cần ranh giới transaction (nhóm G9).
 - `@Entity(name = "G1V4_Customer")` **bắt buộc duy nhất** toàn persistence unit; JPQL viết theo tên này. Bật `hibernate.hbm2ddl.create_namespaces=true`.
