@@ -24,8 +24,13 @@
 | [G7](#g7) | `@ManyToMany` & `@JoinTable` | `joinColumns/inverseJoinColumns`, `Set` vs `List`, `@OrderColumn`, join entity | 14 |
 | [G8](#g8) | `@JoinColumns` (FK nhiều cột) & derived identity | `@EmbeddedId`, `@IdClass`, `@MapsId("field")`, `referencedColumnName` | 7 |
 | [G9](#g9) | Tình huống tổng hợp, phức tạp | self-reference, DTO → merge, `equals/hashCode`, bulk JPQL, service layer | 11 |
+| [G10](#g10) | Truy vấn & persistence context *(mở rộng)* | `join` vs `join fetch`, native query, `Page` + fetch, Criteria | 10 |
+| [G11](#g11) | Transaction & khoá *(mở rộng)* | `readOnly`, propagation, `@Version`, `PESSIMISTIC_*`, `SKIP LOCKED`, deadlock, OSIV | 12 |
+| [G12](#g12) | Mô hình dữ liệu nâng cao *(mở rộng)* | `@Embeddable`, `@ElementCollection`, `@Inheritance`, `@NaturalId`, converter, `@Formula`, `@Filter` | 14 |
+| [G13](#g13) | Hiệu năng & cache *(mở rộng)* | batch, `StatelessSession`, second-level cache, bytecode enhancement | 13 |
+| [G14](#g14) | Lead: sự cố tổng hợp & rào chắn *(mở rộng)* | N+1, lost update, hàng đợi job, import lớn; lint Metamodel, ngân sách SQL | 5 sự cố + 3 rào chắn + 2 tài liệu |
 
-Bảng **annotation → tình huống** nằm ở [cuối file](#coverage).
+Bảng **annotation → tình huống** nằm ở [cuối file](#coverage). G10–G14 là **giai đoạn mở rộng**, thiết kế ở [04-EXTENSION-DESIGN.md](04-EXTENSION-DESIGN.md).
 
 ---
 
@@ -763,6 +768,126 @@ Bảng **annotation → tình huống** nằm ở [cuối file](#coverage).
 
 ---
 
+<a id="g10"></a>
+## G10 — Truy vấn & persistence context *(mở rộng, Phase 13)*
+
+**Câu hỏi trung tâm:** cách viết query ảnh hưởng thế nào tới SQL, tới trạng thái collection và tới những gì nằm trong persistence context?
+**Model:** `Customer` 1—N `PurchaseOrder` 1—N `OrderItem` N—1 `Product`, mọi quan hệ LAZY (biến thể `Q1`, schema `g10_q1_baseline`, giống F1 của G5). `PurchaseOrder` có thêm `status`.
+Phần lớn tình huống chỉ khác **cách viết query**, không khác mapping, nên dùng chung một bộ entity. Dữ liệu chuẩn: 3 customer, mỗi customer 2 order (một PAID, một NEW), mỗi order 2 item, 3 product; seed bằng JDBC.
+
+| Mã | Câu hỏi | Giả thuyết (điểm xuất phát để quan sát, KHÔNG dùng làm assert 🔬) |
+|---|---|---|
+| G10-S01 ⭐ (golden) | `join` và `join fetch` khác nhau thế nào về SQL và trạng thái collection? | `join`: cột select chỉ của customer, `orders` chưa khởi tạo, đọc vào thì thêm SELECT; `join fetch`: lấy cả cột order, đã khởi tạo |
+| G10-S02 ⭐🔬 | `join fetch c.orders o where o.status = 'PAID'`: collection chứa gì, và lần đọc sau trong cùng persistence context thấy gì? | Collection chỉ còn order PAID (thiếu dữ liệu), và bị giữ nguyên như vậy trong PC |
+| G10-S03 ⭐ | `join` thường dùng để lọc, rồi tải collection riêng: cách viết đúng cho S02 | Collection đủ phần tử |
+| G10-S04 ⭐🔬 | Native query có kiểu entity: entity trả về ở trạng thái nào? Có trùng instance đã có trong PC không? | MANAGED, cùng instance, dirty checking chạy |
+| G10-S05 ⭐ | Native query không có kiểu (`Object[]`/tuple): có gì trong PC không? | Không có entity nào, không vòng đời |
+| G10-S06 ⭐🔬 | Native `UPDATE`: entity MANAGED có thấy giá trị mới không? `@Version` có tăng không? | Không thấy; version không tăng |
+| G10-S07 ➕🔬 | Native `SELECT` trên entity có `@SoftDelete` (G9-S11): có tự lọc dòng đã xoá không? | Không lọc |
+| G10-S08 ⭐🔬 | Spring Data `Page` + `@Query` có `join fetch` collection: count query sinh ra thế nào? Khi nào cần `countQuery` riêng? | Count query tự sinh có thể lỗi hoặc sai; cần `countQuery` *(thực tế: sai âm thầm, total = số dòng sau join; xem RESULTS)* |
+| G10-S09 ⭐ | Criteria API / `Specification` cho bộ lọc động: SQL đổi theo tham số, `fetch` trong Specification gặp gì với count query | Giống S08 *(thực tế khác: count query ném `SemanticException`; làm thành S09a/b/c, xem RESULTS)* |
+| G10-S10 ➕ | DTO projection bằng JPQL `select new` so với native + tuple: kết quả không vào PC | 0 entity trong PC |
+
+**Quyết định cho lead (viết trong README nhóm):** khi nào `join`, khi nào `join fetch`; khi nào được dùng native; quy tắc phân trang có fetch.
+
+<a id="g11"></a>
+## G11 — Transaction & khoá *(mở rộng, Phase 14)*
+
+**Câu hỏi trung tâm:** hai transaction chạm cùng dữ liệu thì chuyện gì xảy ra, và ranh giới `@Transactional` quyết định điều gì?
+**Model:** `Product` (có `stock`), `PurchaseOrder`, bảng `job` (hàng đợi việc). Có service layer ở `src/main`. Test song song dùng helper mới `ConcurrentTx` (latch có timeout, không `Thread.sleep`).
+
+| Mã | Câu hỏi | Giả thuyết |
+|---|---|---|
+| G11-S01 ⭐🔬 | `@Transactional(readOnly = true)` tắt gì: dirty checking, snapshot, flush? `save(new)` trong đó thì sao? | Không UPDATE; `save(new)` không INSERT, hoặc Postgres báo read-only transaction |
+| G11-S02 ⭐ | Service A (`REQUIRED`) gọi B (`REQUIRED`) ném RuntimeException, A bắt rồi đi tiếp: commit được không? | `UnexpectedRollbackException` (rollback-only) |
+| G11-S03 ⭐ | `REQUIRES_NEW`: B commit dù A rollback; entity A đã tải có là cùng instance trong B không? | B có persistence context riêng, instance khác |
+| G11-S04 ⭐ | Checked exception có rollback không? `rollbackFor` đổi gì? | Mặc định **commit**; `rollbackFor` mới rollback |
+| G11-S05 ⭐ | Lost update: hai transaction cùng đọc `stock = 10`, cùng trừ 1, không `@Version` | Kết quả 9 thay vì 8 |
+| G11-S06 ⭐ | Cùng S05, ba cách sửa: `@Version` / `PESSIMISTIC_WRITE` / `UPDATE … set stock = stock - 1` | Mỗi cách cho 8, cái giá khác nhau |
+| G11-S07 ⭐🔬 | `PESSIMISTIC_WRITE` / `PESSIMISTIC_READ` sinh SQL gì trên Postgres? | `for update` / `for share` (có thể `for no key update`) |
+| G11-S08 ⭐🔬 | Khoá với timeout 0 (NOWAIT) khi dòng đang bị khoá: exception gì sau khi Spring dịch? | `PessimisticLockingFailureException` hoặc lớp con |
+| G11-S09 ⭐🔬 | Hàng đợi job: hai worker dùng `SKIP LOCKED` lấy việc cùng lúc | Mỗi worker lấy job khác nhau |
+| G11-S10 ⭐🔬 | Deadlock: hai transaction khoá hai dòng ngược thứ tự; sửa bằng khoá theo thứ tự id | Postgres huỷ một transaction; sửa xong hết deadlock |
+| G11-S11 ➕🔬 | `PESSIMISTIC_WRITE` + `left join fetch`: Postgres có từ chối `FOR UPDATE` trên phía nullable của outer join không? | Có lỗi |
+| G11-S12 ➕🔬 | Open Session in View (giả lập, E5): lazy loading sau khi service trả về chạy được nhưng sinh SQL ngoài transaction | Hết `LazyInitializationException` (so với G9-S07), N+1 bị che |
+
+**Quyết định cho lead:** optimistic hay pessimistic; khi nào `REQUIRES_NEW`; quy tắc rollback; vì sao tắt OSIV.
+
+<a id="g12"></a>
+## G12 — Mô hình dữ liệu nâng cao *(mở rộng, Phase 15)*
+
+**Câu hỏi trung tâm:** khi mô hình không chỉ là "entity trỏ tới entity", Hibernate ánh xạ ra bảng và SQL thế nào?
+Mỗi chủ đề có baseline riêng và biến thể khác đúng một điểm (01-DESIGN §7.2).
+
+| Mã | Câu hỏi | Giả thuyết |
+|---|---|---|
+| G12-S01 ⭐ | `@Embeddable Address` dùng hai lần với `@AttributeOverride`: DDL ra sao? Thiếu override thì sao? | Thiếu override là lỗi trùng cột lúc khởi động `[BOOT-FAIL]` |
+| G12-S02 ⭐🔬 | Mọi cột của embeddable đều NULL: đọc lại là `null` hay object rỗng? | `null` |
+| G12-S03 ⭐🔬 | Sửa field của embeddable tại chỗ có UPDATE không? (đối chiếu G8-S07) | Có UPDATE |
+| G12-S04 ⭐ | `@ElementCollection` `List<String>` so với `@OneToMany` tới entity: bỏ 1 phần tử thì SQL gì? | DELETE hết rồi INSERT lại (như G1-S08) |
+| G12-S05 ⭐🔬 | `@ElementCollection` dùng `Set` hoặc `@OrderColumn`: còn recreate không? Bảng có PK không? | Set: DELETE đúng phần tử |
+| G12-S06 ⭐ | `@Inheritance(SINGLE_TABLE)`: DDL, query đa hình | 1 bảng, 1 SELECT, cột lớp con phải nullable |
+| G12-S07 ⭐ | `JOINED`: DDL và SQL của query đa hình | Join mọi bảng lớp con |
+| G12-S08 ⭐🔬 | `TABLE_PER_CLASS`: query đa hình | `union all` |
+| G12-S09 ⭐🔬 | `@ManyToOne` trỏ tới lớp cha trừu tượng: proxy kiểu gì, `instanceof` lớp con đúng hay sai? | Proxy là lớp cha, `instanceof` lớp con sai |
+| G12-S10 ⭐ | `@NaturalId` + `session.byNaturalId(...)`: SQL, và gọi lần hai trong cùng PC | Lần hai 0 SELECT |
+| G12-S11 ⭐🔬 | `AttributeConverter` cho kiểu mutable: sửa tại chỗ có được phát hiện không? `@Enumerated(ORDINAL)` khi đổi thứ tự enum? | Phụ thuộc `equals`; ORDINAL đọc sai im lặng |
+| G12-S12 ➕🔬 | `@Formula`: khi nào được tính lại sau UPDATE? | Chỉ khi tải lại |
+| G12-S13 ➕🔬 | `@SQLRestriction` trên entity và collection: `find` theo id và native có bị lọc không? | Có / không |
+| G12-S14 ➕🔬 | `@Filter`: phải bật theo session; `find` theo id có áp filter không? | Không áp cho `find` |
+
+**Quyết định cho lead:** chiến lược `@Inheritance`; `@ElementCollection` hay entity con; `STRING` hay `ORDINAL`; `@SQLRestriction` / `@Filter` / `@SoftDelete`.
+
+<a id="g13"></a>
+## G13 — Hiệu năng & cache *(mở rộng, Phase 16–17)*
+
+**Câu hỏi trung tâm:** làm sao biết (bằng thứ đếm được, không bằng đồng hồ) một thao tác tốn kém, và cache giúp hay hại ở đâu?
+Chia hai phần: **G13a** ở project gốc (batch, persistence context, second-level cache); **G13b** ở subproject `lab-enhanced/` (bytecode enhancement, E2).
+Chứng cứ: Hibernate `Statistics` + `SqlCaptor` (E4).
+
+| Mã | Câu hỏi | Giả thuyết |
+|---|---|---|
+| G13-S01 ⭐🔬 | Batch insert 100 entity, `SEQUENCE` + `setJdbcBatchSize(20)` | 5 batch (qua Statistics) |
+| G13-S02 ⭐🔬 | Như S01 nhưng `IDENTITY` (thay G9-S10) | Batching bị tắt, 100 lần INSERT |
+| G13-S03 ⭐🔬 | `allocationSize = 1` so với `50`: số lần gọi `nextval` khi insert 100 entity | 100 so với khoảng 2 |
+| G13-S04 ⭐ | Vòng lặp 2 000 dòng: PC lớn dần thế nào; `flush()` + `clear()` theo lô | Đếm entity trong PC (`SessionStatistics`) |
+| G13-S05 ⭐🔬 | `StatelessSession`: không PC, không dirty checking, không cascade, không lazy | Mỗi lệnh là một SQL ngay; chạm quan hệ lazy thì lỗi |
+| G13-S06 ⭐ | Entity cache: `find` ở transaction thứ hai | 0 SELECT |
+| G13-S07 ⭐🔬 | Bulk JPQL / native `UPDATE` có làm hỏng cache không? | Bulk JPQL xoá cả region; native xoá toàn bộ nếu không khai query space |
+| G13-S08 ⭐🔬 | Collection cache chỉ lưu id: phần tử không được cache thì sao? | N+1 SELECT phần tử |
+| G13-S09 ⭐🔬 | Query cache khi entity không được cache | Trả id rồi SELECT từng entity |
+| G13-S10 ➕🔬 | `READ_ONLY` cache mà sửa entity | Exception |
+| G13-S11 ⭐🔬 | (G13b) Bytecode enhancement: thử lại G6-S03 | LAZY phía inverse `@OneToOne` chạy được |
+| G13-S12 ⭐🔬 | (G13b) `@Basic(fetch = LAZY)` cho cột lớn | Không enhancement: bị bỏ qua; có: hoãn |
+| G13-S13 ➕🔬 | (G13b) Dirty tracking của enhancement: UPDATE chỉ cột đổi hay mọi cột? | Chưa rõ |
+
+`hibernate.order_inserts` / `order_updates` **không làm thành test** (chỉ đặt được toàn cục, sẽ đổi thứ tự SQL của G3-S10): chỉ ghi chú README.
+**Quyết định cho lead:** chiến lược id; khi nào bật batch; cache cái gì; có nên bật bytecode enhancement.
+
+<a id="g14"></a>
+## G14 — Lead: sự cố tổng hợp & rào chắn *(mở rộng, Phase 18)*
+
+Mỗi sự cố có **4 test** (E7): tái hiện → chẩn đoán (in bằng chứng) → sửa → rào chắn. Mỗi sự cố có hai package/hai schema: `i<N>_buggy` và `i<N>_fixed`.
+Test rào chắn phải chứng minh **cả hai chiều**: bắt được trên đường lỗi, qua trên đường đã sửa. **Danh sách sự cố chốt lại với người học trước khi viết.**
+
+| Mã | Sự cố (triệu chứng) | Nguyên nhân tái hiện | Kiến thức dùng |
+|---|---|---|---|
+| G14-I1 ⭐ | Trang danh sách đơn hàng chậm dần theo dữ liệu | N+1 + phân trang có fetch + count query | G5, G10 |
+| G14-I2 ⭐ | Tồn kho âm sau flash sale | Lost update | G11 |
+| G14-I3 ⭐ | Job gửi email chạy hai lần | Hai worker lấy cùng việc | G11 |
+| G14-I4 ⭐ | Import file lớn ngày càng chậm | PC phình to, IDENTITY tắt batch | G13 |
+| G14-I5 ➕ | Admin sửa giá nhưng khách vẫn thấy giá cũ | Native update + second-level cache | G10, G13 |
+
+| Mã | Nội dung |
+|---|---|
+| G14-R1 ⭐ | Test **ngân sách SQL**: mỗi use case có giới hạn số SELECT; vượt thì đỏ, kèm in SQL thừa |
+| G14-R2 ⭐ | Test **lint mapping** bằng Metamodel (E8), chứng minh bắt được một entity cố ý sai |
+| G14-R3 ➕ | Đọc Hibernate `Statistics` để chẩn đoán |
+| G14-D1 ⭐ | `docs/LEAD-PLAYBOOK.md`: checklist review PR có JPA + bảng quyết định G0–G13, mỗi dòng trỏ mã tình huống |
+| G14-D2 ⭐ | `docs/adr/`: 3–5 ADR mẫu, mỗi ADR dẫn chứng bằng mã tình huống |
+
+---
+
 <a id="coverage"></a>
 ## Bảng phủ annotation → tình huống
 
@@ -786,6 +911,14 @@ Bảng **annotation → tình huống** nằm ở [cuối file](#coverage).
 | `@BatchSize`, `@Fetch(SUBSELECT)`, `@EntityGraph`, `JOIN FETCH` | G5-S06..S12 |
 | `@OrderColumn` | G7-S06 |
 | Vòng đời T/M/D/R, flush, `merge`, `getReference`, `save()` | G0 (toàn bộ), và có mặt trong mọi tình huống |
+| `join` vs `join fetch`, native query, `Page` + fetch, Criteria/`Specification` *(mở rộng)* | G10 |
+| `@Transactional` (`readOnly`, propagation, `rollbackFor`), OSIV *(mở rộng)* | G11-S01..S04, S12 |
+| `@Version` (lost update), `PESSIMISTIC_*`, `SKIP LOCKED`, deadlock *(mở rộng)* | G11-S05..S11 |
+| `@Embeddable`, `@AttributeOverride`, `@ElementCollection`, `@NaturalId`, `AttributeConverter`, `@Enumerated` *(mở rộng)* | G12-S01..S05, S10, S11 |
+| `@Inheritance` (3 chiến lược) *(mở rộng)* | G12-S06..S09 |
+| `@Formula`, `@SQLRestriction`, `@Filter` *(mở rộng)* | G12-S12..S14 |
+| Batch, `StatelessSession`, `@Cacheable`/`@Cache`, query cache *(mở rộng)* | G13-S01..S10 |
+| Bytecode enhancement *(mở rộng)* | G13-S11..S13 |
 
 ### Kết quả đối chiếu coverage (Phase 12)
 

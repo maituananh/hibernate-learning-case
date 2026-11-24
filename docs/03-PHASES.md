@@ -22,6 +22,15 @@
 | 10 | G8 — `@JoinColumns` & derived identity | 3 / 7 | |
 | 11 | G9 — Tình huống tổng hợp (service layer) | 6 / 11 | |
 | 12 | Tổng kết: RESULTS, CHEATSHEET, coverage | — | ✅ Bàn giao |
+| 13 | Cập nhật tài liệu, danh sách G10–G14, rồi G10 — Truy vấn & persistence context | ⏸ **Dừng sau golden test G10-S01** |
+| 14 | G11 — Transaction & khoá (+ helper chạy song song) | |
+| 15 | G12 — Mô hình dữ liệu nâng cao | |
+| 16 | G13a — Hiệu năng & cache ở project gốc | Đầu phase: 249 test cũ không đổi số SQL |
+| 17 | G13b — Bytecode enhancement (subproject `lab-enhanced/`) | Đầu phase: suite cũ xanh sau khi chuyển `support/` sang `testFixtures` |
+| 18 | G14 — Lead: sự cố tổng hợp & rào chắn | ⏸ **Dừng trước khi viết sự cố, chốt danh sách với người học** |
+| 19 | Tổng kết giai đoạn mở rộng | ✅ Bàn giao |
+
+> Phase 13–19 thuộc **giai đoạn mở rộng**, thiết kế chi tiết ở [04-EXTENSION-DESIGN.md](04-EXTENSION-DESIGN.md) (§7 là bảng phase đầy đủ).
 
 ---
 
@@ -194,11 +203,30 @@ Một test chỉ được coi là xong khi đủ các điều sau:
 
 ---
 
-## Phụ lục — mở rộng sau (ngoài phạm vi hiện tại)
+## Phase 13–19 — Giai đoạn mở rộng (G10–G14)
 
-- `@ElementCollection` so với `@OneToMany` tới entity.
-- `@Inheritance` (`SINGLE_TABLE` / `JOINED` / `TABLE_PER_CLASS`) cùng quan hệ trỏ tới lớp cha.
-- `@Embeddable` value object (Address) và `@AttributeOverride`.
-- Bytecode enhancement, để thử lại G6-S03: LAZY phía inverse `@OneToOne` có chạy được không.
-- `@Formula`, `@SQLRestriction` (thay cho `@Where`), `@Filter`.
-- Second-level cache cho collection.
+Chi tiết từng phase, checkpoint và cách chứng minh "test cũ không đổi" nằm ở [04-EXTENSION-DESIGN.md §7](04-EXTENSION-DESIGN.md).
+Danh sách tình huống nằm ở [02-SCENARIOS.md](02-SCENARIOS.md) (G10–G14). Mỗi phase vẫn: bắt đầu từ `main` mới nhất, ⭐ trước ➕ sau, một commit, suite xanh, cập nhật README nhóm, mở PR.
+
+| Phase | Entity / hạ tầng | Test |
+|---|---|---|
+| 13 | G10: một bộ model baseline `Q1` (Customer, PurchaseOrder, OrderItem, Product, mọi quan hệ LAZY) | `G10JoinVsJoinFetchTest` (S01–S03), `G10NativeQueryTest` (S04–S07), `G10PagingTest` (S08–S10) |
+| 14 | G11: `Product.stock`, `Job`, service layer, helper `ConcurrentTx` trong `support/` | theo từng chủ đề: `readOnly`, propagation, lost update, pessimistic lock, deadlock |
+| 15 | G12: embeddable, element collection, 3 chiến lược `@Inheritance`, `@NaturalId`, converter, `@Formula`/`@SQLRestriction`/`@Filter` | mỗi chủ đề một class |
+| 16 | G13a: dependency `hibernate-jcache` + provider, `evictAll()` trong `AbstractScenarioTest` | batch, persistence context, `StatelessSession`, second-level cache |
+| 17 | G13b: `testFixtures` + subproject `lab-enhanced/` | enhancement (G6-S03 thử lại, `@Basic(fetch = LAZY)`, dirty tracking) |
+| 18 | G14: `i<N>_buggy` / `i<N>_fixed`, test ngân sách SQL, test lint Metamodel | mỗi sự cố 4 test: tái hiện → chẩn đoán → sửa → rào chắn |
+| 19 | — | tổng kết: RESULTS, CHEATSHEET, coverage, README gốc, thời gian chạy |
+
+---
+
+## Phụ lục — mở rộng sau (đã được gộp vào G12/G13)
+
+Sáu mục dưới đây từng nằm ngoài phạm vi; giờ đã được duyệt và gộp vào giai đoạn mở rộng ([04-EXTENSION-DESIGN.md](04-EXTENSION-DESIGN.md)):
+
+- `@ElementCollection` so với `@OneToMany` tới entity → **G12-S04, S05**.
+- `@Inheritance` (`SINGLE_TABLE` / `JOINED` / `TABLE_PER_CLASS`) cùng quan hệ trỏ tới lớp cha → **G12-S06..S09**.
+- `@Embeddable` value object (Address) và `@AttributeOverride` → **G12-S01..S03**.
+- Bytecode enhancement, để thử lại G6-S03 → **G13-S11..S13** (subproject `lab-enhanced/`).
+- `@Formula`, `@SQLRestriction` (thay cho `@Where`), `@Filter` → **G12-S12..S14**.
+- Second-level cache cho collection → **G13-S06..S10**.

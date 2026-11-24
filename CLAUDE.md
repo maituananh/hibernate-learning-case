@@ -4,14 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Trạng thái hiện tại
 
-Repo mới chỉ có **tài liệu kế hoạch** trong `docs/` (chưa có code, chưa có `build.gradle`). Khi bắt đầu implement, đọc theo thứ tự:
+Phase 0–12 (G0–G9) đã xong; đang làm giai đoạn mở rộng G10–G14. Khi bắt đầu implement, đọc theo thứ tự:
 
 - [docs/00-PROMPT.md](docs/00-PROMPT.md): yêu cầu hoàn chỉnh, định dạng test bắt buộc, danh sách "Không được làm".
 - [docs/01-DESIGN.md](docs/01-DESIGN.md): quyết định kỹ thuật D1–D18, cấu trúc project, quy ước (§7), rủi ro (§9).
 - [docs/02-SCENARIOS.md](docs/02-SCENARIOS.md): ~130 tình huống theo nhóm G0–G9 (⭐ = ưu tiên, 🔬 = kết quả chưa chắc).
-- [docs/03-PHASES.md](docs/03-PHASES.md): Phase 0–12, làm từng phase một, ⭐ trước ➕ sau.
+- [docs/03-PHASES.md](docs/03-PHASES.md): Phase 0–19, làm từng phase một, ⭐ trước ➕ sau.
+- [docs/04-EXTENSION-DESIGN.md](docs/04-EXTENSION-DESIGN.md): thiết kế giai đoạn mở rộng G10–G14 (Phase 13–19).
 
-Không tự mở sang phần "mở rộng sau" ở cuối 03-PHASES.
+Giai đoạn mở rộng (Phase 13–19, nhóm G10–G14) đã được duyệt theo [docs/04-EXTENSION-DESIGN.md](docs/04-EXTENSION-DESIGN.md): đọc tài liệu đó (quyết định E1–E8, phạm vi, rủi ro) trước khi làm. Không tự mở thêm ngoài phạm vi đã duyệt.
 
 ## Mục đích
 
@@ -68,7 +69,7 @@ Không viết assert theo trí nhớ. Chạy ở chế độ quan sát (in SQL +
 ## Quy trình
 
 - **Trước khi bắt đầu phase mới:** chuyển sang nhánh `main` và pull code mới nhất (`git checkout main && git pull`). Luôn bắt đầu implement phase mới từ nhánh `main` (đã cập nhật), không tạo nhánh phase từ nhánh phase trước hay từ trạng thái HEAD detached.
-- Làm từng phase theo 03-PHASES. **Dừng chờ người học duyệt** ở 2 checkpoint: (1) sau golden test G0-S01 (Phase 1), (2) sau khi xong G1 (Phase 3).
+- Làm từng phase theo 03-PHASES. **Dừng chờ người học duyệt** ở 4 checkpoint: (1) sau golden test G0-S01 (Phase 1), (2) sau khi xong G1 (Phase 3), (3) sau golden test G10-S01 (Phase 13), (4) trước khi viết sự cố G14 (Phase 18, chốt danh sách sự cố với người học).
 - Cuối mỗi phase: chạy toàn bộ suite, báo số test xanh/đỏ, liệt kê 🔬 khác giả thuyết, cập nhật README của nhóm.
 - Bắt đầu triển khai từng phase của dự án theo thứ tự 03-PHASES. **Mỗi phase commit đúng 1 lần**, sau khi suite xanh và README nhóm đã cập nhật. Không gộp nhiều phase vào một commit, không commit giữa chừng khi phase chưa xong. Message theo dạng `feat(phase-N): <tên phase>` (hoặc `chore`/`docs` nếu phù hợp).
 - **Sau khi commit xong thì push và tạo Pull Request** (`git push -u origin <nhánh>` rồi `gh pr create`). Description của PR viết tiếng Việt có dấu, mô tả **rõ ràng cho từng case (từng tình huống G<N>-S<NN> hoặc từng biến thể) trong phase**, mỗi case gồm:

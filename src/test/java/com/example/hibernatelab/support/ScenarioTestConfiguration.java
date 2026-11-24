@@ -26,7 +26,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 	"com.example.hibernatelab.g6_one_to_one", // Phase 8: G6 (7 biến thể V1…V7, mỗi biến thể một sub-package và một schema)
 	"com.example.hibernatelab.g7_many_to_many", // Phase 9: G7 (9 biến thể M1…M9, mỗi biến thể một sub-package và một schema)
 	"com.example.hibernatelab.g8_composite_fk", // Phase 10: G8 (J1, J1P, J2, J3, J4, mỗi biến thể một sub-package và một schema)
-	"com.example.hibernatelab.g9_integrated" // Phase 11: G9 (tình huống tổng hợp S01…S11, mỗi tình huống một sub-package và một schema; có thêm service)
+	"com.example.hibernatelab.g9_integrated", // Phase 11: G9 (tình huống tổng hợp S01…S11, mỗi tình huống một sub-package và một schema; có thêm service)
+	"com.example.hibernatelab.g10_query" // Phase 13: G10 (truy vấn & persistence context: Q1 baseline dùng chung cho mọi tình huống, Q2 thêm @Version cho S06)
 })
 public class ScenarioTestConfiguration {
 
