@@ -1,0 +1,1 @@
+{ "id": "g14-i1", "schema": "g14_i1_buggy", "tables": ["customer", "purchase_order", "order_item"] }
