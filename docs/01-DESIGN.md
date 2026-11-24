@@ -35,8 +35,8 @@ Mỗi câu hỏi được xét ở 3 dạng: **có** annotation hoặc thuộc t
 ### Non-goals (không làm trong project này)
 - Không có Controller, REST hay UI.
 - Không dùng Flyway hay Liquibase. Schema **do Hibernate sinh ra (`ddl-auto`)**, vì mục đích chính là quan sát mapping sinh ra DB như thế nào.
-- Chưa đụng tới: `@Inheritance`, `@ElementCollection`, `@Embeddable` dạng value object, second-level cache, Envers, multi-tenancy. Xem phụ lục *mở rộng sau* trong 03-PHASES.
-- Không làm benchmark hay tối ưu hiệu năng thật. Số câu SQL chỉ dùng để **minh hoạ**.
+- Vẫn để ngoài: Envers, multi-tenancy, Hibernate Reactive, Jakarta Data repository. `@Inheritance`, `@ElementCollection`, `@Embeddable`, second-level cache, bytecode enhancement đã được duyệt đưa vào **giai đoạn mở rộng G10–G14**: xem [04-EXTENSION-DESIGN.md](04-EXTENSION-DESIGN.md) (các quyết định kỹ thuật E1–E8 ở §5 của tài liệu đó, đánh số `E` để không lẫn với D1–D18 ở đây).
+- Không làm benchmark hay tối ưu hiệu năng thật. Số câu SQL chỉ dùng để **minh hoạ**. (Giai đoạn mở rộng cũng không đo thời gian: hiệu năng được chứng minh bằng thứ đếm được như số SQL, số entity trong persistence context, số lần cache hit.)
 
 ### Anti-goals (vẫn là thất bại dù test xanh)
 - **Assert bằng repository/EntityManager** thay vì đọc DB thật. Persistence context (cache cấp 1) có thể trả về object trong bộ nhớ dù DB khác.
