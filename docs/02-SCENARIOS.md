@@ -872,19 +872,19 @@ Test rào chắn phải chứng minh **cả hai chiều**: bắt được trên 
 
 | Mã | Sự cố (triệu chứng) | Nguyên nhân tái hiện | Kiến thức dùng |
 |---|---|---|---|
-| G14-I1 ⭐ | Trang danh sách đơn hàng chậm dần theo dữ liệu | N+1 + phân trang có fetch + count query | G5, G10 |
-| G14-I2 ⭐ | Tồn kho âm sau flash sale | Lost update | G11 |
-| G14-I3 ⭐ | Job gửi email chạy hai lần | Hai worker lấy cùng việc | G11 |
-| G14-I4 ⭐ | Import file lớn ngày càng chậm | PC phình to, IDENTITY tắt batch | G13 |
-| G14-I5 ➕ | Admin sửa giá nhưng khách vẫn thấy giá cũ | Native update + second-level cache | G10, G13 |
+| G14-I1 ⭐ (S01–S04) | Trang danh sách đơn hàng chậm dần theo dữ liệu | N+1 + phân trang có fetch + count query | G5, G10 |
+| G14-I2 ⭐ (S01–S04) | Tồn kho âm sau flash sale (thực tế: kho ghi sai, bán 12 từ kho 10) | Lost update | G11 |
+| G14-I3 ⭐ (S01–S04) | Job gửi email chạy hai lần | Hai worker lấy cùng việc | G11 |
+| G14-I4 ⭐ (S01–S04) | Import file lớn ngày càng chậm | PC phình to, IDENTITY tắt batch | G13 |
+| G14-I5 ➕ | Admin sửa giá nhưng khách vẫn thấy giá cũ | Native update + second-level cache | G10, G13 | *(không làm: người học chốt chỉ ⭐ ở Phase 18)* |
 
 | Mã | Nội dung |
 |---|---|
-| G14-R1 ⭐ | Test **ngân sách SQL**: mỗi use case có giới hạn số SELECT; vượt thì đỏ, kèm in SQL thừa |
-| G14-R2 ⭐ | Test **lint mapping** bằng Metamodel (E8), chứng minh bắt được một entity cố ý sai |
-| G14-R3 ➕ | Đọc Hibernate `Statistics` để chẩn đoán |
-| G14-D1 ⭐ | `docs/LEAD-PLAYBOOK.md`: checklist review PR có JPA + bảng quyết định G0–G13, mỗi dòng trỏ mã tình huống |
-| G14-D2 ⭐ | `docs/adr/`: 3–5 ADR mẫu, mỗi ADR dẫn chứng bằng mã tình huống |
+| G14-R1 ⭐ | Test **ngân sách SQL**: mỗi use case có giới hạn số SELECT; vượt thì đỏ, kèm in SQL thừa. Test: G14-R1-S01..S03 và G14-I1-S04 |
+| G14-R2 ⭐ | Test **lint mapping** bằng Metamodel (E8), chứng minh bắt được một entity cố ý sai. Test: G14-R2-S01..S03 và G14-I4-S04 |
+| G14-R3 ➕ | Đọc Hibernate `Statistics` để chẩn đoán *(không làm: người học chốt chỉ ⭐ ở Phase 18)* |
+| G14-D1 ⭐ | `docs/LEAD-PLAYBOOK.md`: checklist review PR có JPA + bảng quyết định G0–G13, mỗi dòng trỏ mã tình huống *(đã làm)* |
+| G14-D2 ⭐ | `docs/adr/`: 3–5 ADR mẫu, mỗi ADR dẫn chứng bằng mã tình huống *(đã làm: 5 ADR)* |
 
 ---
 

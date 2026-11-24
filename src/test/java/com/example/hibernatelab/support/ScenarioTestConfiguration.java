@@ -39,7 +39,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 	"com.example.hibernatelab.g10_query", // Phase 13: G10 (truy vấn & persistence context: Q1 baseline dùng chung cho mọi tình huống, Q2 thêm @Version cho S06)
 	"com.example.hibernatelab.g11_tx_lock", // Phase 14: G11 (transaction & khoá: T1 baseline có tồn kho + service, T2 thêm @Version, T3 hàng đợi job; có service layer),
 	"com.example.hibernatelab.g12_advanced_model", // Phase 15: G12 (mô hình dữ liệu nâng cao: E1 embeddable, C1 element collection, H1/H2/H3 inheritance, N1 natural id, V1 converter/enum, F1 formula/restriction/filter)
-	"com.example.hibernatelab.g13_performance" // Phase 16: G13a (hiệu năng & cache: B1/B2/B3 batch & id, P1 persistence context & StatelessSession, K1…K4 second-level cache)
+	"com.example.hibernatelab.g13_performance", // Phase 16: G13a (hiệu năng & cache: B1/B2/B3 batch & id, P1 persistence context & StatelessSession, K1…K4 second-level cache)
+	"com.example.hibernatelab.g14_lead" // Phase 18: G14 (sự cố tổng hợp I1…I4, mỗi sự cố hai package _buggy/_fixed và hai schema; có service)
 })
 public class ScenarioTestConfiguration {
 
