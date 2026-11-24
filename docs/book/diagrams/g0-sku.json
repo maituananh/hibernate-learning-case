@@ -1,0 +1,1 @@
+{ "id": "g0-sku", "schema": "g0_lifecycle", "tables": ["sku_product", "versioned_sku_product"] }

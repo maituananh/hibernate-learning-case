@@ -1,0 +1,1 @@
+{ "id": "g0-customer", "schema": "g0_lifecycle", "tables": ["customer", "identity_customer"] }

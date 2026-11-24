@@ -4,9 +4,9 @@
     { "id": "loi-noi-dau", "file": "005-loi-noi-dau.md", "kind": "front", "title": "Lời nói đầu: Cách đọc cuốn sách này", "status": "todo" },
 
     { "id": "phan-1", "file": "010-phan-1.md", "kind": "part", "title": "Phần I. Nền tảng", "status": "done" },
-    { "id": "01", "file": "011-chuong-01-mo-hinh-mau.md", "kind": "chapter", "number": 1, "title": "Mô hình mẫu và kiến thức tối thiểu", "scenarios": [], "extra": [], "status": "todo" },
-    { "id": "02", "file": "012-chuong-02-vong-doi-entity.md", "kind": "chapter", "number": 2, "title": "Vòng đời entity và persistence context", "scenarios": ["G0-S01..S11", "G0-S13"], "extra": [], "status": "todo" },
-    { "id": "03", "file": "013-chuong-03-anh-xa-cot.md", "kind": "chapter", "number": 3, "title": "Ánh xạ cột và kiểu giá trị: Embeddable, Enum, AttributeConverter, NaturalId", "scenarios": ["G12-S01..S03", "G12-S10", "G12-S11"], "extra": [], "status": "todo" },
+    { "id": "01", "file": "011-chuong-01-mo-hinh-mau.md", "kind": "chapter", "number": 1, "title": "Mô hình mẫu và kiến thức tối thiểu", "scenarios": [], "extra": [], "status": "done" },
+    { "id": "02", "file": "012-chuong-02-vong-doi-entity.md", "kind": "chapter", "number": 2, "title": "Vòng đời entity và persistence context", "scenarios": ["G0-S01..S11", "G0-S13"], "extra": [], "status": "done" },
+    { "id": "03", "file": "013-chuong-03-anh-xa-cot.md", "kind": "chapter", "number": 3, "title": "Ánh xạ cột và kiểu giá trị: Embeddable, Enum, AttributeConverter, NaturalId", "scenarios": ["G12-S01..S03", "G12-S10", "G12-S11"], "extra": [], "status": "done" },
 
     { "id": "phan-2", "file": "020-phan-2.md", "kind": "part", "title": "Phần II. Quan hệ giữa các bảng", "status": "done" },
     { "id": "04", "file": "021-chuong-04-khoa-ngoai.md", "kind": "chapter", "number": 4, "title": "Ai giữ khóa ngoại: ManyToOne, OneToMany và mappedBy", "scenarios": ["G1-S01..S18"], "extra": [], "status": "done" },
